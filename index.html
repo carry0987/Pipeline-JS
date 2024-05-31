@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PipelineJS Example</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="https://carry0987.github.io/favicon.png" type="image/x-icon">
+</head>
+<body>
+    <script src="dist/pipeline.min.js"></script>
+    <script>
+    // Define CustomProcessorType enumeration
+    const CustomProcessorType = {
+        Init: "Init",
+        ProcessA: "ProcessA",
+        ProcessB: "ProcessB",
+        Final: "Final"
+    };
+
+    // Create custom processor
+    class InitProcessor extends PipelineJS.Processor {
+        get type() {
+            return CustomProcessorType.Init;
+        }
+        async _process(data) {
+            return `Init: ${data}`;
+        }
+    }
+
+    class ProcessA extends PipelineJS.Processor {
+        get type() {
+            return CustomProcessorType.ProcessA;
+        }
+        async _process(data) {
+            return `${data} | ProcessA`;
+        }
+    }
+
+    class ProcessB extends PipelineJS.Processor {
+        get type() {
+            return CustomProcessorType.ProcessB;
+        }
+        async _process(data) {
+            return `${data} | ProcessB`;
+        }
+    }
+
+    class FinalProcessor extends PipelineJS.Processor {
+        get type() {
+            return CustomProcessorType.Final;
+        }
+        async _process(data) {
+            return `${data} | Final`;
+        }
+    }
+
+    // Initialize pipeline and register processors
+    const pipeline = new PipelineJS.Pipeline();
+    pipeline.register(new InitProcessor());
+    pipeline.register(new ProcessA());
+    pipeline.register(new ProcessB());
+    pipeline.register(new FinalProcessor(), 10); // You can set priority
+
+    // Run pipeline
+    async function runPipeline() {
+        const result = await pipeline.process('Start');
+        console.log(result); // Expected output: "Init: Start | ProcessA | ProcessB | Final"
+    }
+
+    runPipeline();
+    </script>
+</body>
+</html>

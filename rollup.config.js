@@ -11,13 +11,32 @@ const isProduction = process.env.BUILD === 'production';
 const sourceFile = 'src/index.ts';
 const dtsFile = 'dist/dts/index.d.ts';
 
+const jsConfig = {
+    input: sourceFile,
+    output: [
+        {
+            file: pkg.main,
+            format: 'umd',
+            name: 'PipelineJS',
+            plugins: isProduction ? [terser()] : []
+        }
+    ],
+    plugins: [
+        typescript(),
+        resolve(),
+        replace({
+            preventAssignment: true,
+            __version__: pkg.version
+        })
+    ]
+};
+
 const esConfig = {
     input: sourceFile,
     output: [
         {
             file: pkg.module,
-            format: 'es',
-            plugins: !isProduction ? [terser()] : []
+            format: 'es'
         }
     ],
     plugins: [
@@ -43,4 +62,4 @@ const dtsConfig = {
     ]
 };
 
-export default [esConfig, dtsConfig];
+export default [jsConfig, esConfig, dtsConfig];

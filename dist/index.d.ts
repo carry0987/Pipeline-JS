@@ -2,15 +2,15 @@ import { EventEmitter } from '@carry0987/event-emitter';
 
 type ID = string;
 
-interface PipelineProcessorProps {
+interface ProcessorProps {
 }
-interface PipelineProcessorEvents {
-    propsUpdated: <T, P extends Partial<PipelineProcessorProps>, PT>(processor: PipelineProcessor<T, P, PT>) => void;
+interface ProcessorEvents {
+    propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(processor: Processor<T, P, PT>) => void;
     beforeProcess: (...args: any[]) => void;
     afterProcess: (...args: any[]) => void;
 }
 
-declare abstract class PipelineProcessor<T, P extends Partial<PipelineProcessorProps>, PT> extends EventEmitter<PipelineProcessorEvents> {
+declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
     readonly id: ID;
     private _props;
     abstract get type(): PT;
@@ -34,7 +34,7 @@ interface PipelineEvents<R> {
      * is updated, including when a new processor is registered, a processor's props
      * get updated, etc.
      */
-    updated: <T, P extends PipelineProcessorProps, PT>(processor: PipelineProcessor<T, P, PT>) => void;
+    updated: <T, P extends ProcessorProps, PT>(processor: Processor<T, P, PT>) => void;
     /**
      * Triggers the callback function when a new
      * processor is registered successfully
@@ -65,7 +65,7 @@ declare class Pipeline<R, T extends string | number, PT extends T> extends Event
     private readonly _steps;
     private cache;
     private lastProcessorIndexUpdated;
-    constructor(steps?: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[]);
+    constructor(steps?: Processor<unknown, Partial<ProcessorProps>, PT>[]);
     /**
      * Clears the `cache` array
      */
@@ -76,19 +76,19 @@ declare class Pipeline<R, T extends string | number, PT extends T> extends Event
      * @param processor
      * @param priority
      */
-    register<U, P extends Partial<PipelineProcessorProps>>(processor: PipelineProcessor<U, P, PT>, priority?: number): PipelineProcessor<U, P, PT>;
+    register<U, P extends Partial<ProcessorProps>>(processor: Processor<U, P, PT>, priority?: number): Processor<U, P, PT>;
     /**
      * Tries to register a new processor
      * @param processor
      * @param priority
      */
-    tryRegister<U, P extends Partial<PipelineProcessorProps>>(processor: PipelineProcessor<U, P, PT>, priority: number): PipelineProcessor<U, P, PT> | undefined;
+    tryRegister<U, P extends Partial<ProcessorProps>>(processor: Processor<U, P, PT>, priority: number): Processor<U, P, PT> | undefined;
     /**
      * Removes a processor from the list
      *
      * @param processor
      */
-    unregister<U, P extends Partial<PipelineProcessorProps>, X extends T>(processor: PipelineProcessor<U, P, X>): void;
+    unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, P, X>): void;
     /**
      * Registers a new processor
      *
@@ -99,14 +99,14 @@ declare class Pipeline<R, T extends string | number, PT extends T> extends Event
     /**
      * Flattens the _steps Map and returns a list of steps with their correct priorities
      */
-    get steps(): PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[];
+    get steps(): Processor<unknown, Partial<ProcessorProps>, PT>[];
     /**
      * Accepts ProcessType and returns an array of the registered processes
      * with the give type
      *
      * @param type
      */
-    getStepsByType(type: T): PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[];
+    getStepsByType(type: T): Processor<unknown, Partial<ProcessorProps>, PT>[];
     /**
      * Returns a list of ProcessorType according to their priority
      */
@@ -134,4 +134,6 @@ declare class Pipeline<R, T extends string | number, PT extends T> extends Event
     private afterRegistered;
 }
 
-export { Pipeline, type PipelineEvents, PipelineProcessor, type PipelineProcessorEvents, type PipelineProcessorProps };
+declare const version: string;
+
+export { Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, version };

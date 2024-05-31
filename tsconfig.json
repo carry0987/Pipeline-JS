@@ -7,10 +7,10 @@
         "strict": true,
         "esModuleInterop": true,
         "declaration": true,
-        "outDir": "dist",
+        "outDir": "./dist",
         "declarationDir": "dist/dts/",
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "**/__tests__/*"]
 }

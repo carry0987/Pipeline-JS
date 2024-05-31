@@ -1,5 +1,5 @@
-import { PipelineProcessorProps } from './interfaces';
-import { PipelineProcessor } from '../module/processor';
+import { ProcessorProps } from './interfaces';
+import { Processor } from '../module/processor';
 
 export interface PipelineEvents<R> {
     /**
@@ -7,7 +7,7 @@ export interface PipelineEvents<R> {
      * is updated, including when a new processor is registered, a processor's props
      * get updated, etc.
      */
-    updated: <T, P extends PipelineProcessorProps, PT>(processor: PipelineProcessor<T, P, PT>) => void;
+    updated: <T, P extends ProcessorProps, PT>(processor: Processor<T, P, PT>) => void;
     /**
      * Triggers the callback function when a new
      * processor is registered successfully

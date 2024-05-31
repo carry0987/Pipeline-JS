@@ -1,9 +1,9 @@
-import { PipelineProcessor } from '../module/processor';
+import { Processor } from '../module/processor';
 
-export interface PipelineProcessorProps {}
-export interface PipelineProcessorEvents {
-    propsUpdated: <T, P extends Partial<PipelineProcessorProps>, PT>(
-        processor: PipelineProcessor<T, P, PT>
+export interface ProcessorProps {}
+export interface ProcessorEvents {
+    propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(
+        processor: Processor<T, P, PT>
     ) => void;
     beforeProcess: (...args: any[]) => void;
     afterProcess: (...args: any[]) => void;

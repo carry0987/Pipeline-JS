@@ -1,9 +1,10 @@
 {
   "name": "@carry0987/pipeline",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A modular and efficient pipeline processing system for registering and managing multiple processing steps with caching and event-driven mechanisms.",
   "type": "module",
-  "module": "dist/index.esm.js",
+  "main": "dist/pipeline.min.js",
+  "module": "dist/pipeline.esm.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --config jest.config.js",

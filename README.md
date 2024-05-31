@@ -19,7 +19,7 @@ npm i @carry0987/pipeline -D
 Here's a basic example of how to create and use a pipeline:
 
 ```typescript
-import { Pipeline, PipelineProcessor } from '@carry0987/pipeline';
+import { Pipeline, Processor } from '@carry0987/pipeline';
 
 // Define custom processor types
 enum CustomProcessorType {
@@ -29,8 +29,8 @@ enum CustomProcessorType {
     Final
 }
 
-// Create custom processors by extending PipelineProcessor
-class InitProcessor extends PipelineProcessor<string, {}, CustomProcessorType> {
+// Create custom processors by extending Processor
+class InitProcessor extends Processor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Init;
     }
@@ -39,7 +39,7 @@ class InitProcessor extends PipelineProcessor<string, {}, CustomProcessorType> {
     }
 }
 
-class ProcessA extends PipelineProcessor<string, {}, CustomProcessorType> {
+class ProcessA extends Processor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessA;
     }
@@ -48,7 +48,7 @@ class ProcessA extends PipelineProcessor<string, {}, CustomProcessorType> {
     }
 }
 
-class ProcessB extends PipelineProcessor<string, {}, CustomProcessorType> {
+class ProcessB extends Processor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessB;
     }
@@ -57,7 +57,7 @@ class ProcessB extends PipelineProcessor<string, {}, CustomProcessorType> {
     }
 }
 
-class FinalProcessor extends PipelineProcessor<string, {}, CustomProcessorType> {
+class FinalProcessor extends Processor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Final;
     }
@@ -85,19 +85,19 @@ runPipeline();
 ## API
 ### Pipeline
 #### Methods
-- **constructor(steps?: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[])**
+- **constructor(steps?: Processor<unknown, Partial<ProcessorProps>, PT>[])**
   Initializes a new pipeline with optional initial steps.
 
 - **clearCache()**
   Clears the pipeline's cache.
 
-- **register<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>, priority: number = -1): PipelineProcessor<U, P, PT>**
+- **register<U, P extends Partial<ProcessorProps>, PT extends T>(processor: Processor<U, P, PT>, priority: number = -1): Processor<U, P, PT>**
   Registers a new processor in the pipeline.
 
-- **tryRegister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>, priority: number = -1): PipelineProcessor<U, P, PT> | undefined**
+- **tryRegister<U, P extends Partial<ProcessorProps>, PT extends T>(processor: Processor<U, P, PT>, priority: number = -1): Processor<U, P, PT> | undefined**
   Attempts to register a new processor, returns undefined if registration fails.
 
-- **unregister<U, P extends Partial<PipelineProcessorProps>, X extends T>(processor: PipelineProcessor<U, P, X>): void**
+- **unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, P, X>): void**
   Unregisters a processor from the pipeline.
 
 - **process(data?: R): Promise<R>**

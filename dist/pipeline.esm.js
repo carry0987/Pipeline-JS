@@ -343,7 +343,7 @@ function deepEqual(obj1, obj2) {
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
-class PipelineProcessor extends EventEmitter {
+class Processor extends EventEmitter {
     id;
     _props;
     constructor(props) {
@@ -384,4 +384,6 @@ class PipelineProcessor extends EventEmitter {
     }
 }
 
-export { Pipeline, PipelineProcessor };
+const version = '1.1.0';
+
+export { Pipeline, Processor, version };
