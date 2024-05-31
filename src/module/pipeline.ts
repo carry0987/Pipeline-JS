@@ -148,7 +148,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
             }
         }
 
-        // to remove any undefined elements
+        // To remove any undefined elements
         return steps.filter((s) => s);
     }
 
