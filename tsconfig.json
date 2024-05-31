@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "ESNext",
+        "target": "ESNext",
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "outDir": "dist",
+        "declarationDir": "dist/dts/",
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": ["node_modules", "**/__tests__/*"]
+}
