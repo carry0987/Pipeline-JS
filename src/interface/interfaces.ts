@@ -7,4 +7,5 @@ export interface ProcessorEvents {
     ) => void;
     beforeProcess: (...args: any[]) => void;
     afterProcess: (...args: any[]) => void;
+    error: (error: Error, ...args: any[]) => void;
 }

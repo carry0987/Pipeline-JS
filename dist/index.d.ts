@@ -8,11 +8,13 @@ interface ProcessorEvents {
     propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(processor: Processor<T, P, PT>) => void;
     beforeProcess: (...args: any[]) => void;
     afterProcess: (...args: any[]) => void;
+    error: (error: Error, ...args: any[]) => void;
 }
 
 declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
     readonly id: ID;
     readonly name: string;
+    private static readonly _statusTypes;
     private _props;
     private _status;
     abstract get type(): PT;
@@ -28,7 +30,7 @@ declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> exten
     process(...args: any[]): T | Promise<T>;
     setProps(props: Partial<P>): this;
     get props(): P;
-    get status(): typeof Processor.prototype._status;
+    get status(): typeof Processor._statusTypes[number];
 }
 
 interface PipelineEvents<R> {

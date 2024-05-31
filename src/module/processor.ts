@@ -8,8 +8,9 @@ import { ProcessorEvents, ProcessorProps } from '../interface/interfaces';
 abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
     public readonly id: ID;
     public readonly name: string;
+    private static readonly _statusTypes = ['idle', 'running', 'completed'] as const;
     private _props: P;
-    private _status: 'idle' | 'running' | 'completed';
+    private _status: typeof Processor._statusTypes[number];
 
     abstract get type(): PT;
     protected abstract _process(...args: any[]): T | Promise<T>;
@@ -44,8 +45,11 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
         try {
             result = this._process(...args);
         } catch (error) {
+            const errorObj = error instanceof Error ? error : new Error(String(error));
             this._status = 'idle';
-            throw error;
+            this.emit('error', errorObj, ...args);
+            this.emit('afterProcess', ...args);
+            throw errorObj;
         }
 
         if (result instanceof Promise) {
@@ -54,8 +58,11 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
                 this.emit('afterProcess', ...args);
                 return res;
             }).catch((error) => {
+                const errorObj = error instanceof Error ? error : new Error(String(error));
                 this._status = 'idle';
-                throw error;
+                this.emit('error', errorObj, ...args);
+                this.emit('afterProcess', ...args);
+                throw errorObj;
             });
         } else {
             this._status = 'completed';
@@ -82,7 +89,7 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
         return this._props;
     }
 
-    public get status(): typeof Processor.prototype._status {
+    public get status(): typeof Processor._statusTypes[number] {
         return this._status;
     }
 }

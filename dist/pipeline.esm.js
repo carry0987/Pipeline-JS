@@ -395,6 +395,7 @@ function deepEqual(obj1, obj2) {
 class Processor extends EventEmitter {
     id;
     name;
+    static _statusTypes = ['idle', 'running', 'completed'];
     _props;
     _status;
     constructor(props, name) {
@@ -423,8 +424,11 @@ class Processor extends EventEmitter {
             result = this._process(...args);
         }
         catch (error) {
+            const errorObj = error instanceof Error ? error : new Error(String(error));
             this._status = 'idle';
-            throw error;
+            this.emit('error', errorObj, ...args);
+            this.emit('afterProcess', ...args);
+            throw errorObj;
         }
         if (result instanceof Promise) {
             return result.then((res) => {
@@ -432,8 +436,11 @@ class Processor extends EventEmitter {
                 this.emit('afterProcess', ...args);
                 return res;
             }).catch((error) => {
+                const errorObj = error instanceof Error ? error : new Error(String(error));
                 this._status = 'idle';
-                throw error;
+                this.emit('error', errorObj, ...args);
+                this.emit('afterProcess', ...args);
+                throw errorObj;
             });
         }
         else {
@@ -461,6 +468,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.0';
+const version = '1.2.1';
 
 export { Pipeline, Processor, version };
