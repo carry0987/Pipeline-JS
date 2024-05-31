@@ -37,7 +37,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    public register<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
+    public register<U, P extends Partial<PipelineProcessorProps>>(
         processor: PipelineProcessor<U, P, PT>,
         priority: number = -1
     ): PipelineProcessor<U, P, PT> {
@@ -66,7 +66,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    public tryRegister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
+    public tryRegister<U, P extends Partial<PipelineProcessorProps>>(
         processor: PipelineProcessor<U, P, PT>,
         priority: number
     ): PipelineProcessor<U, P, PT> | undefined {
@@ -104,13 +104,13 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param priority
      */
     private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, X extends T>(
-        processor: PipelineProcessor<U, P, X>,
+        processor: PipelineProcessor<U, P, PT>,
         priority: number = -1
     ): void {
         let subSteps = this._steps.get(processor.type);
 
         if (!subSteps) {
-            const newSubStep: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, X>[] = [];
+            const newSubStep: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[] = [];
             this._steps.set(processor.type, newSubStep);
             subSteps = newSubStep;
         }
