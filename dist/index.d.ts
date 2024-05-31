@@ -66,7 +66,7 @@ interface PipelineEvents<R> {
     error: <T>(prev: T) => void;
 }
 
-declare class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<PipelineEvents<R>> {
+declare class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     private readonly _steps;
     private cache;
     private lastProcessorIndexUpdated;
