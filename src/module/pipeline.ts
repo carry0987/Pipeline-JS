@@ -82,7 +82,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      *
      * @param processor
      */
-    public unregister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>): void {
+    public unregister<U, P extends Partial<PipelineProcessorProps>>(processor: PipelineProcessor<U, P, PT>): void {
         if (!processor) return;
         if (this.findProcessorIndexByID(processor.id) === -1) return;
 
@@ -91,7 +91,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
         if (subSteps && subSteps.length) {
             this._steps.set(
                 processor.type,
-                subSteps.filter((proc) => proc != processor)
+                subSteps.filter((proc) => proc.id !== processor.id)
             );
             this.emit('updated', processor);
         }
