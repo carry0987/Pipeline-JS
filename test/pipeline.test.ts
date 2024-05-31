@@ -1,18 +1,20 @@
-import Pipeline from '../src/module/pipeline';
+import { Pipeline } from '../src/module/pipeline';
 import { PipelineProcessor } from '../src/module/processor';
-import { ProcessorType } from '../src/type/types';
+import { ProcessorType } from './type/types';
 
-class MockProcessor extends PipelineProcessor<string, {}> {
-    get type() {
+// MockProcessor class defined with generic types
+class MockProcessor extends PipelineProcessor<string, {}, ProcessorType> {
+    get type(): ProcessorType {
         return ProcessorType.Extractor;
     }
-    protected _process() {
+
+    protected _process(): string {
         return 'processed';
     }
 }
 
 test('Pipeline processes data correctly', async () => {
-    const pipeline = new Pipeline<string>();
+    const pipeline = new Pipeline<string, ProcessorType, ProcessorType>();
     const processor = new MockProcessor();
 
     pipeline.register(processor);

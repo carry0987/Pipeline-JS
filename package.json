@@ -6,7 +6,7 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "jest --config jest.config.js",
     "start": "rollup --config rollup.config.js",
     "build": "rollup --config rollup.config.js --environment BUILD:production",
     "clean": "pnpm clean",

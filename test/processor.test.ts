@@ -1,11 +1,13 @@
 import { PipelineProcessor } from '../src/module/processor';
-import { ProcessorType } from '../src/type/types';
+import { ProcessorType } from './type/types';
 
-class MockProcessor extends PipelineProcessor<string, {}> {
-    get type() {
+// MockProcessor class defined with generic types
+class MockProcessor extends PipelineProcessor<string, {}, ProcessorType> {
+    get type(): ProcessorType {
         return ProcessorType.Extractor;
     }
-    protected _process() {
+
+    protected _process(): string {
         return 'processed';
     }
 }

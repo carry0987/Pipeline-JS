@@ -17,7 +17,7 @@ const esConfig = {
         {
             file: pkg.module,
             format: 'es',
-            plugins: isProduction ? [terser()] : []
+            plugins: !isProduction ? [terser()] : []
         }
     ],
     plugins: [
