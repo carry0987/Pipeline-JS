@@ -1,4 +1,5 @@
 # Pipeline-JS
+[![NPM](https://img.shields.io/npm/v/@carry0987/pipeline.svg)](https://www.npmjs.com/package/@carry0987/pipeline)  
 **`@carry0987/pipeline`** is a highly modular and efficient pipeline processing system designed for managing and executing a series of processing steps. It allows users to register various types of processors, prioritize their execution order, and handle events such as processor registration, property updates, and processing completion. The system also includes a caching mechanism to avoid redundant processing, making it ideal for complex data transformation and processing workflows.
 
 ## Features
