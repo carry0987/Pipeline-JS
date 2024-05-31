@@ -103,7 +103,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    private addProcessorByPriority<U, P extends Partial<ProcessorProps>, X extends T>(
+    private addProcessorByPriority<U, P extends Partial<ProcessorProps>>(
         processor: Processor<U, P, PT>,
         priority: number = -1
     ): void {
@@ -214,12 +214,68 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
     }
 
     /**
+     * Removes all processors from the pipeline
+     */
+    public clearProcessors(): void {
+        this._steps.clear();
+        this.clearCache();
+    }
+
+    /**
+     * Returns processor by ID
+     *
+     * @param id
+     */
+    public getProcessorByID(processorID: ID): Processor<unknown, Partial<ProcessorProps>, PT> | null {
+        const index = this.findProcessorIndexByID(processorID);
+
+        return index > -1 ? this.steps[index] : null;
+    }
+
+    /**
      * Returns the registered processor's index in _steps array
      *
      * @param processorID
      */
     private findProcessorIndexByID(processorID: ID): number {
         return this.steps.findIndex((p) => p.id == processorID);
+    }
+
+    /**
+     * Runs a processor by its ID
+     *
+     * @param processorID
+     * @param data
+     * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
+     */
+    public async runProcessorByID(processorID: ID, data?: R, rerunAllFollowing: boolean = true): Promise<R | undefined> {
+        const processorIndex = this.findProcessorIndexByID(processorID);
+
+        if (processorIndex === -1) {
+            throw Error(`Processor ID ${processorID} not found`);
+        }
+
+        if (rerunAllFollowing) {
+            this.lastProcessorIndexUpdated = processorIndex;
+            // Clear cache for all processors after the rerun processor
+            this.clearCacheAfterProcessorIndex(processorIndex);
+        } else {
+            // If not rerunning all, just clear the cache for the specific processor
+            this.cache.delete(processorID);
+        }
+
+        return this.process(data);
+    }
+
+    /**
+     * Clears the cache for all processors after the specified index
+     *
+     * @param index
+     */
+    private clearCacheAfterProcessorIndex(index: number): void {
+        this.steps.slice(index).forEach(processor => {
+            this.cache.delete(processor.id);
+        });
     }
 
     /**

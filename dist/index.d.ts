@@ -12,11 +12,13 @@ interface ProcessorEvents {
 
 declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
     readonly id: ID;
+    readonly name: string;
     private _props;
+    private _status;
     abstract get type(): PT;
     protected abstract _process(...args: any[]): T | Promise<T>;
     protected validateProps?(...args: any[]): void;
-    constructor(props?: Partial<P>);
+    constructor(props?: Partial<P>, name?: string);
     /**
      * process is used to call beforeProcess and afterProcess callbacks
      * This function is just a wrapper that calls _process()
@@ -26,6 +28,7 @@ declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> exten
     process(...args: any[]): T | Promise<T>;
     setProps(props: Partial<P>): this;
     get props(): P;
+    get status(): typeof Processor.prototype._status;
 }
 
 interface PipelineEvents<R> {
@@ -119,11 +122,35 @@ declare class Pipeline<R, T extends string | number, PT extends T> extends Event
      */
     process(data?: R): Promise<R>;
     /**
+     * Removes all processors from the pipeline
+     */
+    clearProcessors(): void;
+    /**
+     * Returns processor by ID
+     *
+     * @param id
+     */
+    getProcessorByID(processorID: ID): Processor<unknown, Partial<ProcessorProps>, PT> | null;
+    /**
      * Returns the registered processor's index in _steps array
      *
      * @param processorID
      */
     private findProcessorIndexByID;
+    /**
+     * Runs a processor by its ID
+     *
+     * @param processorID
+     * @param data
+     * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
+     */
+    runProcessorByID(processorID: ID, data?: R, rerunAllFollowing?: boolean): Promise<R | undefined>;
+    /**
+     * Clears the cache for all processors after the specified index
+     *
+     * @param index
+     */
+    private clearCacheAfterProcessorIndex;
     /**
      * Sets the last updates processors index locally
      * This is used to invalid or skip a processor in

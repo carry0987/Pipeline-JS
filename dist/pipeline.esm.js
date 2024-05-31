@@ -266,12 +266,61 @@ class Pipeline extends EventEmitter {
         return prev;
     }
     /**
+     * Removes all processors from the pipeline
+     */
+    clearProcessors() {
+        this._steps.clear();
+        this.clearCache();
+    }
+    /**
+     * Returns processor by ID
+     *
+     * @param id
+     */
+    getProcessorByID(processorID) {
+        const index = this.findProcessorIndexByID(processorID);
+        return index > -1 ? this.steps[index] : null;
+    }
+    /**
      * Returns the registered processor's index in _steps array
      *
      * @param processorID
      */
     findProcessorIndexByID(processorID) {
         return this.steps.findIndex((p) => p.id == processorID);
+    }
+    /**
+     * Runs a processor by its ID
+     *
+     * @param processorID
+     * @param data
+     * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
+     */
+    async runProcessorByID(processorID, data, rerunAllFollowing = true) {
+        const processorIndex = this.findProcessorIndexByID(processorID);
+        if (processorIndex === -1) {
+            throw Error(`Processor ID ${processorID} not found`);
+        }
+        if (rerunAllFollowing) {
+            this.lastProcessorIndexUpdated = processorIndex;
+            // Clear cache for all processors after the rerun processor
+            this.clearCacheAfterProcessorIndex(processorIndex);
+        }
+        else {
+            // If not rerunning all, just clear the cache for the specific processor
+            this.cache.delete(processorID);
+        }
+        return this.process(data);
+    }
+    /**
+     * Clears the cache for all processors after the specified index
+     *
+     * @param index
+     */
+    clearCacheAfterProcessorIndex(index) {
+        this.steps.slice(index).forEach(processor => {
+            this.cache.delete(processor.id);
+        });
     }
     /**
      * Sets the last updates processors index locally
@@ -345,11 +394,15 @@ function deepEqual(obj1, obj2) {
 // e.g. Extractor = 0 will be processed before Transformer = 1
 class Processor extends EventEmitter {
     id;
+    name;
     _props;
-    constructor(props) {
+    _status;
+    constructor(props, name) {
         super();
         this._props = {};
+        this._status = 'idle';
         this.id = generateUUID();
+        this.name = name || 'Unnamed Processor';
         if (props)
             this.setProps(props);
     }
@@ -363,10 +416,31 @@ class Processor extends EventEmitter {
         if (this.validateProps instanceof Function) {
             this.validateProps(...args);
         }
+        this._status = 'running';
         this.emit('beforeProcess', ...args);
-        const result = this._process(...args);
-        this.emit('afterProcess', ...args);
-        return result;
+        let result;
+        try {
+            result = this._process(...args);
+        }
+        catch (error) {
+            this._status = 'idle';
+            throw error;
+        }
+        if (result instanceof Promise) {
+            return result.then((res) => {
+                this._status = 'completed';
+                this.emit('afterProcess', ...args);
+                return res;
+            }).catch((error) => {
+                this._status = 'idle';
+                throw error;
+            });
+        }
+        else {
+            this._status = 'completed';
+            this.emit('afterProcess', ...args);
+            return result;
+        }
     }
     setProps(props) {
         const updatedProps = {
@@ -382,8 +456,11 @@ class Processor extends EventEmitter {
     get props() {
         return this._props;
     }
+    get status() {
+        return this._status;
+    }
 }
 
-const version = '1.1.0';
+const version = '1.2.0';
 
 export { Pipeline, Processor, version };
