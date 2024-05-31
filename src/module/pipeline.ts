@@ -82,7 +82,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      *
      * @param processor
      */
-    public unregister<U, P extends Partial<PipelineProcessorProps>>(processor: PipelineProcessor<U, P, PT>): void {
+    public unregister<U, P extends Partial<PipelineProcessorProps>, X extends T>(processor: PipelineProcessor<U, P, X>): void {
         if (!processor) return;
         if (this.findProcessorIndexByID(processor.id) === -1) return;
 
@@ -103,14 +103,14 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
-        processor: PipelineProcessor<U, P, PT>,
+    private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, X extends T>(
+        processor: PipelineProcessor<U, P, X>,
         priority: number = -1
     ): void {
         let subSteps = this._steps.get(processor.type);
 
         if (!subSteps) {
-            const newSubStep: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[] = [];
+            const newSubStep: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, X>[] = [];
             this._steps.set(processor.type, newSubStep);
             subSteps = newSubStep;
         }
@@ -227,7 +227,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * This is used to invalid or skip a processor in
      * the process() method
      */
-    private setLastProcessorIndex<U, P extends Partial<PipelineProcessorProps>, PT>(processor: PipelineProcessor<U, P, PT>): void {
+    private setLastProcessorIndex<U, P extends Partial<PipelineProcessorProps>, X>(processor: PipelineProcessor<U, P, X>): void {
         const processorIndex = this.findProcessorIndexByID(processor.id);
 
         if (this.lastProcessorIndexUpdated > processorIndex) {
@@ -235,13 +235,13 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
         }
     }
 
-    private processorPropsUpdated<U, P extends Partial<PipelineProcessorProps>, PT>(processor: PipelineProcessor<U, P, PT>): void {
+    private processorPropsUpdated<U, P extends Partial<PipelineProcessorProps>, X>(processor: PipelineProcessor<U, P, X>): void {
         this.setLastProcessorIndex(processor);
         this.emit('propsUpdated');
         this.emit('updated', processor);
     }
 
-    private afterRegistered<U, P extends Partial<PipelineProcessorProps>, PT>(processor: PipelineProcessor<U, P, PT>): void {
+    private afterRegistered<U, P extends Partial<PipelineProcessorProps>, X>(processor: PipelineProcessor<U, P, X>): void {
         this.setLastProcessorIndex(processor);
         this.emit('afterRegister');
         this.emit('updated', processor);
