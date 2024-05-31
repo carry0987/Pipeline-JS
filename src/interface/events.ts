@@ -7,7 +7,7 @@ export interface PipelineEvents<R> {
      * is updated, including when a new processor is registered, a processor's props
      * get updated, etc.
      */
-    updated: <T, P extends PipelineProcessorProps>(processor: PipelineProcessor<T, P>) => void;
+    updated: <T, P extends PipelineProcessorProps, PT>(processor: PipelineProcessor<T, P, PT>) => void;
     /**
      * Triggers the callback function when a new
      * processor is registered successfully

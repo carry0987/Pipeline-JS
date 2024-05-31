@@ -1,16 +1,15 @@
 import { generateUUID, ID } from './utils/id';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { deepEqual } from './utils/deepEqual';
-import { ProcessorType } from '../type/types';
 import { PipelineProcessorEvents, PipelineProcessorProps } from '../interface/interfaces';
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
-abstract class PipelineProcessor<T, P extends Partial<PipelineProcessorProps>> extends EventEmitter<PipelineProcessorEvents> {
+abstract class PipelineProcessor<T, P extends Partial<PipelineProcessorProps>, PT> extends EventEmitter<PipelineProcessorEvents> {
     public readonly id: ID;
     private _props: P;
 
-    abstract get type(): ProcessorType;
+    abstract get type(): PT;
     protected abstract _process(...args: any[]): T | Promise<T>;
     protected validateProps?(...args: any[]): void;
 
