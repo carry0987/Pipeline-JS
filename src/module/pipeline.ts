@@ -5,7 +5,7 @@ import { EventEmitter } from '@carry0987/event-emitter';
 import { PipelineEvents } from '../interface/events';
 import { PipelineProcessorProps } from '../interface/interfaces';
 
-class Pipeline<R, T, PT> extends EventEmitter<PipelineEvents<R>> {
+class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<PipelineEvents<R>> {
     // available steps for this pipeline
     private readonly _steps: Map<T, PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[]> = new Map<T, PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[]>();
     // used to cache the results of processors using their id field
@@ -39,7 +39,7 @@ class Pipeline<R, T, PT> extends EventEmitter<PipelineEvents<R>> {
      */
     public register<U, P extends Partial<PipelineProcessorProps>, PT>(
         processor: PipelineProcessor<U, P, PT>,
-        priority: number
+        priority: number = -1
     ): PipelineProcessor<U, P, PT> {
         if (!processor) {
             throw Error('Processor is not defined');
@@ -105,7 +105,7 @@ class Pipeline<R, T, PT> extends EventEmitter<PipelineEvents<R>> {
      */
     private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, PT>(
         processor: PipelineProcessor<U, P, PT>,
-        priority: number
+        priority: number = -1
     ): void {
         let subSteps = this._steps.get(processor.type);
 
