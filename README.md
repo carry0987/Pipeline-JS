@@ -29,7 +29,7 @@ enum CustomProcessorType {
 }
 
 // Create custom processors by extending PipelineProcessor
-class InitProcessor extends PipelineProcessor<string, {}> {
+class InitProcessor extends PipelineProcessor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Init;
     }
@@ -38,7 +38,7 @@ class InitProcessor extends PipelineProcessor<string, {}> {
     }
 }
 
-class ProcessA extends PipelineProcessor<string, {}> {
+class ProcessA extends PipelineProcessor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessA;
     }
@@ -47,7 +47,7 @@ class ProcessA extends PipelineProcessor<string, {}> {
     }
 }
 
-class ProcessB extends PipelineProcessor<string, {}> {
+class ProcessB extends PipelineProcessor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessB;
     }
@@ -56,7 +56,7 @@ class ProcessB extends PipelineProcessor<string, {}> {
     }
 }
 
-class FinalProcessor extends PipelineProcessor<string, {}> {
+class FinalProcessor extends PipelineProcessor<string, {}, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Final;
     }
@@ -66,7 +66,7 @@ class FinalProcessor extends PipelineProcessor<string, {}> {
 }
 
 // Initialize the pipeline with custom processors
-const pipeline = new Pipeline<string, CustomProcessorType>();
+const pipeline = new Pipeline<string, CustomProcessorType, CustomProcessorType>();
 
 pipeline.register(new InitProcessor());
 pipeline.register(new ProcessA());
@@ -84,19 +84,19 @@ runPipeline();
 ## API
 ### Pipeline
 #### Methods
-- **constructor(steps?: PipelineProcessor<unknown, unknown>[])**
+- **constructor(steps?: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[])**
   Initializes a new pipeline with optional initial steps.
 
 - **clearCache()**
   Clears the pipeline's cache.
 
-- **register<T, P>(processor: PipelineProcessor<T, P>, priority: number = null): PipelineProcessor<T, P>**
+- **register<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>, priority: number = -1): PipelineProcessor<U, P, PT>**
   Registers a new processor in the pipeline.
 
-- **tryRegister<T, P>(processor: PipelineProcessor<T, P>, priority: number = null): PipelineProcessor<T, P> | undefined**
+- **tryRegister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>, priority: number = -1): PipelineProcessor<U, P, PT> | undefined**
   Attempts to register a new processor, returns undefined if registration fails.
 
-- **unregister<T, P>(processor: PipelineProcessor<T, P>): void**
+- **unregister<U, P extends Partial<PipelineProcessorProps>, X extends T>(processor: PipelineProcessor<U, P, X>): void**
   Unregisters a processor from the pipeline.
 
 - **process(data?: R): Promise<R>**
