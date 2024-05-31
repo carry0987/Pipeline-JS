@@ -37,7 +37,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    public register<U, P extends Partial<PipelineProcessorProps>, PT>(
+    public register<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
         processor: PipelineProcessor<U, P, PT>,
         priority: number = -1
     ): PipelineProcessor<U, P, PT> {
@@ -66,7 +66,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    public tryRegister<U, P extends Partial<PipelineProcessorProps>, PT>(
+    public tryRegister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
         processor: PipelineProcessor<U, P, PT>,
         priority: number
     ): PipelineProcessor<U, P, PT> | undefined {
@@ -82,7 +82,7 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      *
      * @param processor
      */
-    public unregister<U, P extends Partial<PipelineProcessorProps>, PT>(processor: PipelineProcessor<U, P, PT>): void {
+    public unregister<U, P extends Partial<PipelineProcessorProps>, PT extends T>(processor: PipelineProcessor<U, P, PT>): void {
         if (!processor) return;
         if (this.findProcessorIndexByID(processor.id) === -1) return;
 
@@ -103,14 +103,14 @@ class Pipeline<R, T extends string | number, PT extends T> extends EventEmitter<
      * @param processor
      * @param priority
      */
-    private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, PT>(
+    private addProcessorByPriority<U, P extends Partial<PipelineProcessorProps>, PT extends T>(
         processor: PipelineProcessor<U, P, PT>,
         priority: number = -1
     ): void {
         let subSteps = this._steps.get(processor.type);
 
         if (!subSteps) {
-            const newSubStep = [];
+            const newSubStep: PipelineProcessor<unknown, Partial<PipelineProcessorProps>, PT>[] = [];
             this._steps.set(processor.type, newSubStep);
             subSteps = newSubStep;
         }
