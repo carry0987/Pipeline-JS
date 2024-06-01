@@ -27,7 +27,7 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * Clears the `cache` array
      */
     public clearCache(): void {
-        this.cache = new Map<string, object>();
+        this.cache = new Map<string, unknown>();
         this.lastProcessorIndexUpdated = -1;
     }
 
@@ -115,22 +115,10 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
             subSteps = newSubStep;
         }
 
-        if (priority === null || priority < 0) {
+        if (priority < 0 || priority >= subSteps.length) {
             subSteps.push(processor);
         } else {
-            if (!subSteps[priority]) {
-                // Slot is empty
-                subSteps[priority] = processor;
-            } else {
-                // Slot is NOT empty
-                const first = subSteps.slice(0, priority - 1);
-                const second = subSteps.slice(priority + 1);
-
-                this._steps.set(
-                    processor.type,
-                    first.concat(processor).concat(second)
-                );
-            }
+            subSteps.splice(priority, 0, processor);
         }
     }
 
@@ -195,6 +183,9 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
                 } else {
                     // Cached results already exist
                     prev = this.cache.get(processor.id) as R;
+                    if (prev === undefined) {
+                        prev = (await processor.process(prev)) as R;
+                    }
                 }
             }
         } catch (e) {
@@ -248,19 +239,19 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    public async runProcessorByID(processorID: ID, data?: R, rerunAllFollowing: boolean = true): Promise<R | undefined> {
+    public async runProcessorByID(processorID: ID, data?: R, runAllFollowing: boolean = true): Promise<R | undefined> {
         const processorIndex = this.findProcessorIndexByID(processorID);
 
         if (processorIndex === -1) {
             throw Error(`Processor ID ${processorID} not found`);
         }
 
-        if (rerunAllFollowing) {
+        if (runAllFollowing) {
             this.lastProcessorIndexUpdated = processorIndex;
             // Clear cache for all processors after the rerun processor
             this.clearCacheAfterProcessorIndex(processorIndex);
         } else {
-            // If not rerunning all, just clear the cache for the specific processor
+            // If not re-running all, just clear the cache for the specific processor
             this.cache.delete(processorID);
         }
 

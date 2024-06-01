@@ -181,20 +181,11 @@ class Pipeline extends EventEmitter {
             this._steps.set(processor.type, newSubStep);
             subSteps = newSubStep;
         }
-        if (priority === null || priority < 0) {
+        if (priority < 0 || priority >= subSteps.length) {
             subSteps.push(processor);
         }
         else {
-            if (!subSteps[priority]) {
-                // Slot is empty
-                subSteps[priority] = processor;
-            }
-            else {
-                // Slot is NOT empty
-                const first = subSteps.slice(0, priority - 1);
-                const second = subSteps.slice(priority + 1);
-                this._steps.set(processor.type, first.concat(processor).concat(second));
-            }
+            subSteps.splice(priority, 0, processor);
         }
     }
     /**
@@ -250,6 +241,9 @@ class Pipeline extends EventEmitter {
                 else {
                     // Cached results already exist
                     prev = this.cache.get(processor.id);
+                    if (prev === undefined) {
+                        prev = (await processor.process(prev));
+                    }
                 }
             }
         }
@@ -296,18 +290,18 @@ class Pipeline extends EventEmitter {
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    async runProcessorByID(processorID, data, rerunAllFollowing = true) {
+    async runProcessorByID(processorID, data, runAllFollowing = true) {
         const processorIndex = this.findProcessorIndexByID(processorID);
         if (processorIndex === -1) {
             throw Error(`Processor ID ${processorID} not found`);
         }
-        if (rerunAllFollowing) {
+        if (runAllFollowing) {
             this.lastProcessorIndexUpdated = processorIndex;
             // Clear cache for all processors after the rerun processor
             this.clearCacheAfterProcessorIndex(processorIndex);
         }
         else {
-            // If not rerunning all, just clear the cache for the specific processor
+            // If not re-running all, just clear the cache for the specific processor
             this.cache.delete(processorID);
         }
         return this.process(data);
@@ -346,7 +340,7 @@ class Pipeline extends EventEmitter {
 }
 
 function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    return 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = (Math.random() * 16) | 0, v = c == 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
     });
@@ -403,7 +397,7 @@ class Processor extends EventEmitter {
         this._props = {};
         this._status = 'idle';
         this.id = generateUUID();
-        this.name = name || 'Unnamed Processor';
+        this.name = name;
         if (props)
             this.setProps(props);
     }

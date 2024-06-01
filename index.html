@@ -38,8 +38,7 @@
     // Define CustomProcessorType enumeration
     const CustomProcessorType = {
         Init: "Init",
-        ProcessA: "ProcessA",
-        ProcessB: "ProcessB",
+        Process: "Process",
         Final: "Final"
     };
 
@@ -55,7 +54,7 @@
 
     class ProcessA extends PipelineJS.Processor {
         get type() {
-            return CustomProcessorType.ProcessA;
+            return CustomProcessorType.Process;
         }
         async _process(data) {
             return `${data} | ProcessA`;
@@ -64,7 +63,7 @@
 
     class ProcessB extends PipelineJS.Processor {
         get type() {
-            return CustomProcessorType.ProcessB;
+            return CustomProcessorType.Process;
         }
         async _process(data) {
             return `${data} | ProcessB`;
@@ -83,9 +82,9 @@
     // Initialize pipeline and register processors
     const pipeline = new PipelineJS.Pipeline();
     pipeline.register(new InitProcessor());
-    pipeline.register(new ProcessA());
-    pipeline.register(new ProcessB());
-    pipeline.register(new FinalProcessor(), 10); // You can set priority
+    pipeline.register(new ProcessB({}, 'B'), 1);
+    pipeline.register(new ProcessA({}, 'A'), 0); // You can set priority
+    pipeline.register(new FinalProcessor());
 
     // Function to run pipeline and display result on the page
     async function runPipeline() {
@@ -101,21 +100,21 @@
         // Run the pipeline
         const result = await pipeline.process('Start');
 
-        // Delay for 2 seconds
+        // Delay for 0.5 seconds
         setTimeout(() => {
             // Display the result on the page
             consoleLogElement.innerHTML = result;
 
             // Re-enable the button
             runButton.disabled = false;
-        }, 1000);
+        }, 500);
     }
 
     // Function to show the list of processors
     function showProcessorList() {
         const processorListElement = document.getElementById('processor-list');
         const processors = pipeline.steps.map((processor, index) => {
-            return `${index + 1}. ${processor.type}`;
+            return `${index + 1}. ${processor.name ?? processor.type}`;
         });
 
         processorListElement.innerHTML = processors.join('\n');

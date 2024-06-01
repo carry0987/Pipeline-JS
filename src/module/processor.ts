@@ -1,13 +1,14 @@
 import { generateUUID, ID } from './utils/id';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { deepEqual } from './utils/deepEqual';
-import { ProcessorEvents, ProcessorProps } from '../interface/interfaces';
+import { ProcessorProps } from '../interface/interfaces';
+import { ProcessorEvents } from '../interface/events';
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
 abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
     public readonly id: ID;
-    public readonly name: string;
+    public readonly name?: string;
     private static readonly _statusTypes = ['idle', 'running', 'completed'] as const;
     private _props: P;
     private _status: typeof Processor._statusTypes[number];
@@ -22,7 +23,7 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
         this._props = {} as P;
         this._status = 'idle';
         this.id = generateUUID();
-        this.name = name || 'Unnamed Processor';
+        this.name = name;
 
         if (props) this.setProps(props);
     }

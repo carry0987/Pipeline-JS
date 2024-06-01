@@ -4,34 +4,6 @@ type ID = string;
 
 interface ProcessorProps {
 }
-interface ProcessorEvents {
-    propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(processor: Processor<T, P, PT>) => void;
-    beforeProcess: (...args: any[]) => void;
-    afterProcess: (...args: any[]) => void;
-    error: (error: Error, ...args: any[]) => void;
-}
-
-declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
-    readonly id: ID;
-    readonly name: string;
-    private static readonly _statusTypes;
-    private _props;
-    private _status;
-    abstract get type(): PT;
-    protected abstract _process(...args: any[]): T | Promise<T>;
-    protected validateProps?(...args: any[]): void;
-    constructor(props?: Partial<P>, name?: string);
-    /**
-     * process is used to call beforeProcess and afterProcess callbacks
-     * This function is just a wrapper that calls _process()
-     *
-     * @param args
-     */
-    process(...args: any[]): T | Promise<T>;
-    setProps(props: Partial<P>): this;
-    get props(): P;
-    get status(): typeof Processor._statusTypes[number];
-}
 
 interface PipelineEvents<R> {
     /**
@@ -64,6 +36,58 @@ interface PipelineEvents<R> {
      * throws an Error
      */
     error: <T>(prev: T) => void;
+}
+interface ProcessorEvents {
+    /**
+     * Event triggered when a processor's properties are updated.
+     *
+     * @param processor - The processor instance that had its properties updated.
+     */
+    propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(processor: Processor<T, P, PT>) => void;
+    /**
+     * Event triggered before a processor starts processing.
+     * This allows for any pre-processing steps or logging to occur.
+     *
+     * @param args - Arguments passed to the process method.
+     */
+    beforeProcess: (...args: any[]) => void;
+    /**
+     * Event triggered after a processor finishes processing.
+     * This allows for any post-processing steps or logging to occur.
+     *
+     * @param args - Arguments passed to the process method.
+     */
+    afterProcess: (...args: any[]) => void;
+    /**
+     * Event triggered when a processing error occurs.
+     * This allows for error handling or logging to take place.
+     *
+     * @param error - The error that occurred during processing.
+     * @param args - Arguments passed to the process method.
+     */
+    error: (error: Error, ...args: any[]) => void;
+}
+
+declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
+    readonly id: ID;
+    readonly name?: string;
+    private static readonly _statusTypes;
+    private _props;
+    private _status;
+    abstract get type(): PT;
+    protected abstract _process(...args: any[]): T | Promise<T>;
+    protected validateProps?(...args: any[]): void;
+    constructor(props?: Partial<P>, name?: string);
+    /**
+     * process is used to call beforeProcess and afterProcess callbacks
+     * This function is just a wrapper that calls _process()
+     *
+     * @param args
+     */
+    process(...args: any[]): T | Promise<T>;
+    setProps(props: Partial<P>): this;
+    get props(): P;
+    get status(): typeof Processor._statusTypes[number];
 }
 
 declare class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
@@ -146,7 +170,7 @@ declare class Pipeline<R, T extends string | number, PT extends T = T> extends E
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    runProcessorByID(processorID: ID, data?: R, rerunAllFollowing?: boolean): Promise<R | undefined>;
+    runProcessorByID(processorID: ID, data?: R, runAllFollowing?: boolean): Promise<R | undefined>;
     /**
      * Clears the cache for all processors after the specified index
      *
