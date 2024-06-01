@@ -7,14 +7,14 @@ class MockProcessor extends Processor<string, {}, ProcessorType> {
         return ProcessorType.Extractor;
     }
 
-    protected _process(): string {
+    protected async _process(): Promise<string> {
         return 'processed';
     }
 }
 
-test('Processor processes data correctly', () => {
+test('Processor processes data correctly', async () => {
     const processor = new MockProcessor();
-    const result = processor.process();
+    const result = await processor.process();
 
     expect(result).toBe('processed');
 });
@@ -26,7 +26,7 @@ test('Processor sets and updates properties correctly', () => {
     expect(processor.props).toEqual({ prop1: 'value1', prop2: 'value2' });
 });
 
-test('Processor emits events correctly', () => {
+test('Processor emits events correctly', async () => {
     const processor = new MockProcessor();
     const beforeProcessSpy = jest.fn();
     const afterProcessSpy = jest.fn();
@@ -37,7 +37,7 @@ test('Processor emits events correctly', () => {
     processor.on('error', errorSpy);
 
     // Verify beforeProcess and afterProcess events
-    const result = processor.process();
+    const result = await processor.process();
     expect(result).toBe('processed');
     expect(beforeProcessSpy).toHaveBeenCalled();
     expect(afterProcessSpy).toHaveBeenCalled();
@@ -49,7 +49,7 @@ test('Processor emits events correctly', () => {
             return ProcessorType.Extractor;
         }
 
-        protected _process(): string {
+        protected async _process(): Promise<string> {
             throw new Error('Error!');
         }
     }
@@ -57,7 +57,7 @@ test('Processor emits events correctly', () => {
     const errorProcessor = new ErrorProcessor();
     errorProcessor.on('error', errorSpy);
 
-    expect(() => errorProcessor.process()).toThrow('Error!');
+    await expect(errorProcessor.process()).rejects.toThrow('Error!');
     expect(errorSpy).toHaveBeenCalled();
 });
 

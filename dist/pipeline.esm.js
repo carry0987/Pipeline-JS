@@ -407,15 +407,17 @@ class Processor extends EventEmitter {
      *
      * @param args
      */
-    process(...args) {
+    async process(...args) {
         if (this.validateProps instanceof Function) {
             this.validateProps(...args);
         }
         this._status = 'running';
         this.emit('beforeProcess', ...args);
-        let result;
         try {
-            result = this._process(...args);
+            const result = await this._process(...args);
+            this._status = 'completed';
+            this.emit('afterProcess', ...args);
+            return result;
         }
         catch (error) {
             const errorObj = error instanceof Error ? error : new Error(String(error));
@@ -423,24 +425,6 @@ class Processor extends EventEmitter {
             this.emit('error', errorObj, ...args);
             this.emit('afterProcess', ...args);
             throw errorObj;
-        }
-        if (result instanceof Promise) {
-            return result.then((res) => {
-                this._status = 'completed';
-                this.emit('afterProcess', ...args);
-                return res;
-            }).catch((error) => {
-                const errorObj = error instanceof Error ? error : new Error(String(error));
-                this._status = 'idle';
-                this.emit('error', errorObj, ...args);
-                this.emit('afterProcess', ...args);
-                throw errorObj;
-            });
-        }
-        else {
-            this._status = 'completed';
-            this.emit('afterProcess', ...args);
-            return result;
         }
     }
     setProps(props) {
@@ -462,6 +446,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.3';
+const version = '1.2.4';
 
 export { Pipeline, Processor, version };

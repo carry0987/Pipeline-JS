@@ -8,7 +8,7 @@ class MockProcessor extends Processor<string, {}, ProcessorType> {
         return ProcessorType.Extractor;
     }
 
-    protected _process(): string {
+    protected async _process(): Promise<string> {
         return 'processed';
     }
 }
@@ -18,7 +18,7 @@ class FailingProcessor extends Processor<string, {}, ProcessorType> {
         return ProcessorType.Transformer;
     }
 
-    protected _process(): string {
+    protected async _process(): Promise<string> {
         throw new Error('Processing failed');
     }
 }
@@ -74,13 +74,13 @@ test('Pipeline caches processor results correctly', async () => {
     expect(pipeline.steps.length).toBe(1);
 });
 
-test('Pipeline respects processor priorities', () => {
+test('Pipeline respects processor priorities', async () => {
     class PriorityProcessor extends Processor<string, {}, ProcessorType> {
         get type(): ProcessorType {
             return ProcessorType.Extractor;
         }
 
-        protected _process(): string {
+        protected async _process(): Promise<string> {
             return 'priority_processed';
         }
     }
@@ -92,6 +92,6 @@ test('Pipeline respects processor priorities', () => {
     pipeline.register(processor1);
     pipeline.register(processor2, 0);
 
-    expect(pipeline.steps[0].process()).toBe('priority_processed');
-    expect(pipeline.steps[1].process()).toBe('processed');
+    expect(await pipeline.steps[0].process()).toBe('priority_processed');
+    expect(await pipeline.steps[1].process()).toBe('processed');
 });

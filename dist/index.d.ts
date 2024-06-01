@@ -75,7 +75,7 @@ declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> exten
     private _props;
     private _status;
     abstract get type(): PT;
-    protected abstract _process(...args: any[]): T | Promise<T>;
+    protected abstract _process(...args: any[]): Promise<T>;
     protected validateProps?(...args: any[]): void;
     constructor(props?: Partial<P>, name?: string);
     /**
@@ -84,7 +84,7 @@ declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> exten
      *
      * @param args
      */
-    process(...args: any[]): T | Promise<T>;
+    process(...args: any[]): Promise<T>;
     setProps(props: Partial<P>): this;
     get props(): P;
     get status(): typeof Processor._statusTypes[number];

@@ -14,7 +14,7 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
     private _status: typeof Processor._statusTypes[number];
 
     abstract get type(): PT;
-    protected abstract _process(...args: any[]): T | Promise<T>;
+    protected abstract _process(...args: any[]): Promise<T>;
     protected validateProps?(...args: any[]): void;
 
     constructor(props?: Partial<P>, name?: string) {
@@ -34,41 +34,25 @@ abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends Event
      *
      * @param args
      */
-    public process(...args: any[]): T | Promise<T> {
+    public async process(...args: any[]): Promise<T> {
         if (this.validateProps instanceof Function) {
             this.validateProps(...args);
         }
-
+    
         this._status = 'running';
         this.emit('beforeProcess', ...args);
-        let result: T | Promise<T>;
-
+    
         try {
-            result = this._process(...args);
-        } catch (error) {
+            const result = await this._process(...args);
+            this._status = 'completed';
+            this.emit('afterProcess', ...args);
+            return result;
+        } catch (error: unknown) {
             const errorObj = error instanceof Error ? error : new Error(String(error));
             this._status = 'idle';
             this.emit('error', errorObj, ...args);
             this.emit('afterProcess', ...args);
             throw errorObj;
-        }
-
-        if (result instanceof Promise) {
-            return result.then((res) => {
-                this._status = 'completed';
-                this.emit('afterProcess', ...args);
-                return res;
-            }).catch((error) => {
-                const errorObj = error instanceof Error ? error : new Error(String(error));
-                this._status = 'idle';
-                this.emit('error', errorObj, ...args);
-                this.emit('afterProcess', ...args);
-                throw errorObj;
-            });
-        } else {
-            this._status = 'completed';
-            this.emit('afterProcess', ...args);
-            return result;
         }
     }
 
