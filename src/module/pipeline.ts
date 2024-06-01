@@ -4,8 +4,9 @@ import log from './utils/log';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { PipelineEvents } from '../interface/events';
 import { ProcessorProps } from '../interface/interfaces';
+import { ProcessorType } from '../type/types';
 
-class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
+class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     // Available steps for this pipeline
     private readonly _steps: Map<T, Processor<unknown, PT, Partial<ProcessorProps>>[]> = new Map<T, Processor<unknown, PT, Partial<ProcessorProps>>[]>();
     // Used to cache the results of processors using their id field
