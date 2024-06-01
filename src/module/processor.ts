@@ -3,10 +3,11 @@ import { EventEmitter } from '@carry0987/event-emitter';
 import { deepEqual } from './utils/deepEqual';
 import { ProcessorProps } from '../interface/interfaces';
 import { ProcessorEvents } from '../interface/events';
+import { ProcessorType } from '../type/types';
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
-abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
+abstract class Processor<T, PT extends ProcessorType, P extends Partial<ProcessorProps> = {}> extends EventEmitter<ProcessorEvents> {
     public readonly id: ID;
     public readonly name?: string;
     private static readonly _statusTypes = ['idle', 'running', 'completed'] as const;

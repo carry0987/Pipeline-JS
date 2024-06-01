@@ -2,7 +2,7 @@ import { Processor } from '../src/module/processor';
 import { ProcessorType } from './type/types';
 
 // MockProcessor class defined with generic types
-class MockProcessor extends Processor<string, {}, ProcessorType> {
+class MockProcessor extends Processor<string, ProcessorType> {
     get type(): ProcessorType {
         return ProcessorType.Extractor;
     }
@@ -44,7 +44,7 @@ test('Processor emits events correctly', async () => {
     expect(errorSpy).not.toHaveBeenCalled();
 
     // Verify error event
-    class ErrorProcessor extends Processor<string, {}, ProcessorType> {
+    class ErrorProcessor extends Processor<string, ProcessorType> {
         get type(): ProcessorType {
             return ProcessorType.Extractor;
         }
