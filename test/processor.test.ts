@@ -18,3 +18,53 @@ test('Processor processes data correctly', () => {
 
     expect(result).toBe('processed');
 });
+
+test('Processor sets and updates properties correctly', () => {
+    const processor = new MockProcessor({ prop1: 'value1' });
+
+    processor.setProps({ prop2: 'value2' });
+    expect(processor.props).toEqual({ prop1: 'value1', prop2: 'value2' });
+});
+
+test('Processor emits events correctly', () => {
+    const processor = new MockProcessor();
+    const beforeProcessSpy = jest.fn();
+    const afterProcessSpy = jest.fn();
+    const errorSpy = jest.fn();
+
+    processor.on('beforeProcess', beforeProcessSpy);
+    processor.on('afterProcess', afterProcessSpy);
+    processor.on('error', errorSpy);
+
+    // Verify beforeProcess and afterProcess events
+    const result = processor.process();
+    expect(result).toBe('processed');
+    expect(beforeProcessSpy).toHaveBeenCalled();
+    expect(afterProcessSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    // Verify error event
+    class ErrorProcessor extends Processor<string, {}, ProcessorType> {
+        get type(): ProcessorType {
+            return ProcessorType.Extractor;
+        }
+
+        protected _process(): string {
+            throw new Error('Error!');
+        }
+    }
+
+    const errorProcessor = new ErrorProcessor();
+    errorProcessor.on('error', errorSpy);
+
+    expect(() => errorProcessor.process()).toThrow('Error!');
+    expect(errorSpy).toHaveBeenCalled();
+});
+
+test('Processor generates unique IDs', () => {
+    const processor1 = new MockProcessor();
+    const processor2 = new MockProcessor();
+
+    expect(processor1.id).not.toBe(processor2.id);
+    expect(processor1.id).toMatch(/^[0-9a-fA-F-]{36}$/); // UUID format
+});
