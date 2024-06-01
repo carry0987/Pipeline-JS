@@ -28,7 +28,7 @@ export interface PipelineEvents<R> {
      * afterProcess will not be called if there is an
      * error in the pipeline (i.e a step throw an Error)
      */
-    afterProcess: (prev: R) => void;
+    afterProcess: (prev: R | undefined) => void;
     /**
      * Triggers the callback function when the pipeline
      * fails to process all steps or at least one step

@@ -237,14 +237,14 @@ class Pipeline extends EventEmitter {
                     // updated processor was before "processor".
                     // This is to ensure that we always have correct and up to date
                     // data from processors and also to skip them when necessary
-                    prev = (await processor.process(prev));
+                    prev = await processor.process(prev);
                     this.cache.set(processor.id, prev);
                 }
                 else {
                     // Cached results already exist
                     prev = this.cache.get(processor.id);
                     if (prev === undefined) {
-                        prev = (await processor.process(prev));
+                        prev = await processor.process(prev);
                     }
                 }
             }
@@ -448,6 +448,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.5';
+const version = '1.2.6';
 
 export { Pipeline, Processor, version };

@@ -31,7 +31,7 @@ interface PipelineEvents<R> {
      * afterProcess will not be called if there is an
      * error in the pipeline (i.e a step throw an Error)
      */
-    afterProcess: (prev: R) => void;
+    afterProcess: (prev: R | undefined) => void;
     /**
      * Triggers the callback function when the pipeline
      * fails to process all steps or at least one step
@@ -96,7 +96,7 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
     private readonly _steps;
     private cache;
     private lastProcessorIndexUpdated;
-    constructor(steps?: Processor<unknown, PT, Partial<ProcessorProps>>[]);
+    constructor(steps?: Processor<R, PT, Partial<ProcessorProps>>[]);
     /**
      * Clears the `cache` array
      */
@@ -107,19 +107,19 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      * @param processor
      * @param priority
      */
-    register<U, P extends Partial<ProcessorProps>>(processor: Processor<U, PT, P>, priority?: number): Processor<U, PT, P>;
+    register<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority?: number): Processor<R, PT, P>;
     /**
      * Tries to register a new processor
      * @param processor
      * @param priority
      */
-    tryRegister<U, P extends Partial<ProcessorProps>>(processor: Processor<U, PT, P>, priority: number): Processor<U, PT, P> | undefined;
+    tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number): Processor<R, PT, P> | undefined;
     /**
      * Removes a processor from the list
      *
      * @param processor
      */
-    unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, PT, P>): void;
+    unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void;
     /**
      * Registers a new processor
      *
@@ -130,14 +130,14 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
     /**
      * Flattens the _steps Map and returns a list of steps with their correct priorities
      */
-    get steps(): Processor<unknown, PT, Partial<ProcessorProps>>[];
+    get steps(): Processor<R, PT, Partial<ProcessorProps>>[];
     /**
      * Accepts ProcessType and returns an array of the registered processes
      * with the give type
      *
      * @param type
      */
-    getStepsByType(type: T): Processor<unknown, PT, Partial<ProcessorProps>>[];
+    getStepsByType(type: T): Processor<R, PT, Partial<ProcessorProps>>[];
     /**
      * Returns a list of ProcessorType according to their priority
      */
@@ -148,7 +148,7 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      *
      * @param data
      */
-    process(data?: R): Promise<R>;
+    process(data?: R): Promise<R | undefined>;
     /**
      * Removes all processors from the pipeline
      */
@@ -158,7 +158,7 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      *
      * @param id
      */
-    getProcessorByID(processorID: ID): Processor<unknown, PT, Partial<ProcessorProps>> | null;
+    getProcessorByID(processorID: ID): Processor<R, PT, Partial<ProcessorProps>> | null;
     /**
      * Returns the registered processor's index in _steps array
      *
