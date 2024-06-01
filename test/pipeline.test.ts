@@ -3,7 +3,7 @@ import { Processor } from '../src/module/processor';
 import { ProcessorType } from './type/types';
 import log from '../src/module/utils/log';
 
-class MockProcessor extends Processor<string, {}, ProcessorType> {
+class MockProcessor extends Processor<string, ProcessorType> {
     get type(): ProcessorType {
         return ProcessorType.Extractor;
     }
@@ -13,7 +13,7 @@ class MockProcessor extends Processor<string, {}, ProcessorType> {
     }
 }
 
-class FailingProcessor extends Processor<string, {}, ProcessorType> {
+class FailingProcessor extends Processor<string, ProcessorType> {
     get type(): ProcessorType {
         return ProcessorType.Transformer;
     }
@@ -75,7 +75,7 @@ test('Pipeline caches processor results correctly', async () => {
 });
 
 test('Pipeline respects processor priorities', async () => {
-    class PriorityProcessor extends Processor<string, {}, ProcessorType> {
+    class PriorityProcessor extends Processor<string, ProcessorType> {
         get type(): ProcessorType {
             return ProcessorType.Extractor;
         }

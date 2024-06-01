@@ -4,18 +4,19 @@ import log from './utils/log';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { PipelineEvents } from '../interface/events';
 import { ProcessorProps } from '../interface/interfaces';
+import { ProcessorType } from '../type/types';
 
-class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
-    // available steps for this pipeline
-    private readonly _steps: Map<T, Processor<unknown, Partial<ProcessorProps>, PT>[]> = new Map<T, Processor<unknown, Partial<ProcessorProps>, PT>[]>();
-    // used to cache the results of processors using their id field
+class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
+    // Available steps for this pipeline
+    private readonly _steps: Map<T, Processor<unknown, PT, Partial<ProcessorProps>>[]> = new Map<T, Processor<unknown, PT, Partial<ProcessorProps>>[]>();
+    // Used to cache the results of processors using their id field
     private cache: Map<string, unknown> = new Map<string, unknown>();
-    // keeps the index of the last updated processor in the registered
+    // Keeps the index of the last updated processor in the registered
     // processors list and will be used to invalidate the cache
     // -1 means all new processors should be processed
     private lastProcessorIndexUpdated = -1;
 
-    constructor(steps?: Processor<unknown, Partial<ProcessorProps>, PT>[]) {
+    constructor(steps?: Processor<unknown, PT, Partial<ProcessorProps>>[]) {
         super();
 
         if (steps) {
@@ -38,9 +39,9 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * @param priority
      */
     public register<U, P extends Partial<ProcessorProps>>(
-        processor: Processor<U, P, PT>,
+        processor: Processor<U, PT, P>,
         priority: number = -1
-    ): Processor<U, P, PT> {
+    ): Processor<U, PT, P> {
         if (!processor) {
             throw Error('Processor is not defined');
         }
@@ -54,7 +55,7 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
         }
 
         // Binding the propsUpdated callback to the Pipeline
-        processor.on('propsUpdated', this.processorPropsUpdated.bind(this));
+        processor.on('propsUpdated', this.processorPropsUpdated.bind(this, processor));
         this.addProcessorByPriority(processor, priority);
         this.afterRegistered(processor);
 
@@ -67,9 +68,9 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * @param priority
      */
     public tryRegister<U, P extends Partial<ProcessorProps>>(
-        processor: Processor<U, P, PT>,
+        processor: Processor<U, PT, P>,
         priority: number
-    ): Processor<U, P, PT> | undefined {
+    ): Processor<U, PT, P> | undefined {
         try {
             return this.register(processor, priority);
         } catch (_) {
@@ -82,7 +83,7 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      *
      * @param processor
      */
-    public unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, P, X>): void {
+    public unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, PT, P>): void {
         if (!processor) return;
         if (this.findProcessorIndexByID(processor.id) === -1) return;
 
@@ -93,6 +94,8 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
                 processor.type,
                 subSteps.filter((proc) => proc.id !== processor.id)
             );
+            // Remove the event listener
+            processor.off('propsUpdated', this.processorPropsUpdated.bind(this, processor));
             this.emit('updated', processor);
         }
     }
@@ -104,13 +107,13 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * @param priority
      */
     private addProcessorByPriority<U, P extends Partial<ProcessorProps>>(
-        processor: Processor<U, P, PT>,
+        processor: Processor<U, PT, P>,
         priority: number = -1
     ): void {
         let subSteps = this._steps.get(processor.type);
 
         if (!subSteps) {
-            const newSubStep: Processor<unknown, Partial<ProcessorProps>, PT>[] = [];
+            const newSubStep: Processor<unknown, PT, Partial<ProcessorProps>>[] = [];
             this._steps.set(processor.type, newSubStep);
             subSteps = newSubStep;
         }
@@ -125,8 +128,8 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
     /**
      * Flattens the _steps Map and returns a list of steps with their correct priorities
      */
-    public get steps(): Processor<unknown, Partial<ProcessorProps>, PT>[] {
-        let steps: Processor<unknown, Partial<ProcessorProps>, PT>[] = [];
+    public get steps(): Processor<unknown, PT, Partial<ProcessorProps>>[] {
+        let steps: Processor<unknown, PT, Partial<ProcessorProps>>[] = [];
 
         for (const type of this.getSortedProcessorTypes()) {
             const subSteps = this._steps.get(type);
@@ -146,7 +149,7 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      *
      * @param type
      */
-    public getStepsByType(type: T): Processor<unknown, Partial<ProcessorProps>, PT>[] {
+    public getStepsByType(type: T): Processor<unknown, PT, Partial<ProcessorProps>>[] {
         return this.steps.filter((process) => process.type === type);
     }
 
@@ -217,9 +220,8 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      *
      * @param id
      */
-    public getProcessorByID(processorID: ID): Processor<unknown, Partial<ProcessorProps>, PT> | null {
+    public getProcessorByID(processorID: ID): Processor<unknown, PT, Partial<ProcessorProps>> | null {
         const index = this.findProcessorIndexByID(processorID);
-
         return index > -1 ? this.steps[index] : null;
     }
 
@@ -274,7 +276,7 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
      * This is used to invalid or skip a processor in
      * the process() method
      */
-    private setLastProcessorIndex<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, P, X>): void {
+    private setLastProcessorIndex<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, PT, P>): void {
         const processorIndex = this.findProcessorIndexByID(processor.id);
 
         if (this.lastProcessorIndexUpdated > processorIndex) {
@@ -282,13 +284,13 @@ class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmit
         }
     }
 
-    private processorPropsUpdated<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, P, X>): void {
+    private processorPropsUpdated<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, PT, P>): void {
         this.setLastProcessorIndex(processor);
         this.emit('propsUpdated');
         this.emit('updated', processor);
     }
 
-    private afterRegistered<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, P, X>): void {
+    private afterRegistered<U, P extends Partial<ProcessorProps>, X>(processor: Processor<U, PT, P>): void {
         this.setLastProcessorIndex(processor);
         this.emit('afterRegister');
         this.emit('updated', processor);
