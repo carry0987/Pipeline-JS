@@ -5,13 +5,15 @@ type ID = string;
 interface ProcessorProps {
 }
 
+type ProcessorType = string | number;
+
 interface PipelineEvents<R> {
     /**
      * Generic updated event. Triggers the callback function when the pipeline
      * is updated, including when a new processor is registered, a processor's props
      * get updated, etc.
      */
-    updated: <T, P extends ProcessorProps, PT>(processor: Processor<T, P, PT>) => void;
+    updated: <T, PT extends ProcessorType, P extends ProcessorProps>(processor: Processor<T, PT, P>) => void;
     /**
      * Triggers the callback function when a new
      * processor is registered successfully
@@ -43,7 +45,7 @@ interface ProcessorEvents {
      *
      * @param processor - The processor instance that had its properties updated.
      */
-    propsUpdated: <T, P extends Partial<ProcessorProps>, PT>(processor: Processor<T, P, PT>) => void;
+    propsUpdated: <T, PT extends ProcessorType, P extends Partial<ProcessorProps>>(processor: Processor<T, PT, P>) => void;
     /**
      * Event triggered before a processor starts processing.
      * This allows for any pre-processing steps or logging to occur.
@@ -68,7 +70,7 @@ interface ProcessorEvents {
     error: (error: Error, ...args: any[]) => void;
 }
 
-declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> extends EventEmitter<ProcessorEvents> {
+declare abstract class Processor<T, PT extends ProcessorType, P extends Partial<ProcessorProps> = {}> extends EventEmitter<ProcessorEvents> {
     readonly id: ID;
     readonly name?: string;
     private static readonly _statusTypes;
@@ -90,11 +92,11 @@ declare abstract class Processor<T, P extends Partial<ProcessorProps>, PT> exten
     get status(): typeof Processor._statusTypes[number];
 }
 
-declare class Pipeline<R, T extends string | number, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
+declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     private readonly _steps;
     private cache;
     private lastProcessorIndexUpdated;
-    constructor(steps?: Processor<unknown, Partial<ProcessorProps>, PT>[]);
+    constructor(steps?: Processor<unknown, PT, Partial<ProcessorProps>>[]);
     /**
      * Clears the `cache` array
      */
@@ -105,19 +107,19 @@ declare class Pipeline<R, T extends string | number, PT extends T = T> extends E
      * @param processor
      * @param priority
      */
-    register<U, P extends Partial<ProcessorProps>>(processor: Processor<U, P, PT>, priority?: number): Processor<U, P, PT>;
+    register<U, P extends Partial<ProcessorProps>>(processor: Processor<U, PT, P>, priority?: number): Processor<U, PT, P>;
     /**
      * Tries to register a new processor
      * @param processor
      * @param priority
      */
-    tryRegister<U, P extends Partial<ProcessorProps>>(processor: Processor<U, P, PT>, priority: number): Processor<U, P, PT> | undefined;
+    tryRegister<U, P extends Partial<ProcessorProps>>(processor: Processor<U, PT, P>, priority: number): Processor<U, PT, P> | undefined;
     /**
      * Removes a processor from the list
      *
      * @param processor
      */
-    unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, P, X>): void;
+    unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, PT, P>): void;
     /**
      * Registers a new processor
      *
@@ -128,14 +130,14 @@ declare class Pipeline<R, T extends string | number, PT extends T = T> extends E
     /**
      * Flattens the _steps Map and returns a list of steps with their correct priorities
      */
-    get steps(): Processor<unknown, Partial<ProcessorProps>, PT>[];
+    get steps(): Processor<unknown, PT, Partial<ProcessorProps>>[];
     /**
      * Accepts ProcessType and returns an array of the registered processes
      * with the give type
      *
      * @param type
      */
-    getStepsByType(type: T): Processor<unknown, Partial<ProcessorProps>, PT>[];
+    getStepsByType(type: T): Processor<unknown, PT, Partial<ProcessorProps>>[];
     /**
      * Returns a list of ProcessorType according to their priority
      */
@@ -156,7 +158,7 @@ declare class Pipeline<R, T extends string | number, PT extends T = T> extends E
      *
      * @param id
      */
-    getProcessorByID(processorID: ID): Processor<unknown, Partial<ProcessorProps>, PT> | null;
+    getProcessorByID(processorID: ID): Processor<unknown, PT, Partial<ProcessorProps>> | null;
     /**
      * Returns the registered processor's index in _steps array
      *
@@ -189,4 +191,4 @@ declare class Pipeline<R, T extends string | number, PT extends T = T> extends E
 
 declare const version: string;
 
-export { Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, version };
+export { Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, type ProcessorType, version };

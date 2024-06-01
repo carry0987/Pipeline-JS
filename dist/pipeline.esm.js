@@ -96,11 +96,11 @@ class EventEmitter {
 }
 
 class Pipeline extends EventEmitter {
-    // available steps for this pipeline
+    // Available steps for this pipeline
     _steps = new Map();
-    // used to cache the results of processors using their id field
+    // Used to cache the results of processors using their id field
     cache = new Map();
-    // keeps the index of the last updated processor in the registered
+    // Keeps the index of the last updated processor in the registered
     // processors list and will be used to invalidate the cache
     // -1 means all new processors should be processed
     lastProcessorIndexUpdated = -1;
@@ -134,7 +134,7 @@ class Pipeline extends EventEmitter {
             throw Error(`Processor ID ${processor.id} is already defined`);
         }
         // Binding the propsUpdated callback to the Pipeline
-        processor.on('propsUpdated', this.processorPropsUpdated.bind(this));
+        processor.on('propsUpdated', this.processorPropsUpdated.bind(this, processor));
         this.addProcessorByPriority(processor, priority);
         this.afterRegistered(processor);
         return processor;
@@ -165,6 +165,8 @@ class Pipeline extends EventEmitter {
         const subSteps = this._steps.get(processor.type);
         if (subSteps && subSteps.length) {
             this._steps.set(processor.type, subSteps.filter((proc) => proc.id !== processor.id));
+            // Remove the event listener
+            processor.off('propsUpdated', this.processorPropsUpdated.bind(this, processor));
             this.emit('updated', processor);
         }
     }
@@ -446,6 +448,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.4';
+const version = '1.2.5';
 
 export { Pipeline, Processor, version };
