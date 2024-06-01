@@ -55,7 +55,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
         }
 
         // Binding the propsUpdated callback to the Pipeline
-        processor.on('propsUpdated', this.processorPropsUpdated.bind(this));
+        processor.on('propsUpdated', this.processorPropsUpdated.bind(this, processor));
         this.addProcessorByPriority(processor, priority);
         this.afterRegistered(processor);
 
@@ -94,6 +94,8 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
                 processor.type,
                 subSteps.filter((proc) => proc.id !== processor.id)
             );
+            // Remove the event listener
+            processor.off('propsUpdated', this.processorPropsUpdated.bind(this, processor));
             this.emit('updated', processor);
         }
     }
