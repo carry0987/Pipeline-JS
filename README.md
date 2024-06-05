@@ -86,22 +86,22 @@ runPipeline();
 ## API
 ### Pipeline
 #### Methods
-- **`constructor(steps?: Processor<R, PT, Partial<ProcessorProps>>[])`**
+- **`constructor(steps?: Processor<R, PT, Partial<ProcessorProps>>[])`**  
   Initializes a new pipeline with optional initial steps.
 
-- **`clearCache(): void`**
+- **`clearCache(): void`**  
   Clears the pipeline's cache.
 
-- **`register<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number = -1): Processor<R, PT, P>`**
+- **`register<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number = -1): Processor<R, PT, P>`**  
   Registers a new processor in the pipeline.
 
-- **`tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number): Processor<R, PT, P> | undefined`**
+- **`tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number): Processor<R, PT, P> | undefined`**  
   Attempts to register a new processor, returns undefined if registration fails.
 
-- **`unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void`**
+- **`unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void`**  
   Unregisters a processor from the pipeline.
 
-- **`process(data?: R): Promise<R | undefined>`**
+- **`process(data?: R): Promise<R | undefined>`**  
   Runs all registered processors and returns the final output.
 
 ## Contributing
