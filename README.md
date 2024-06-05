@@ -31,7 +31,7 @@ enum CustomProcessorType {
 }
 
 // Create custom processors by extending Processor
-class InitProcessor extends Processor<string, {}, CustomProcessorType> {
+class InitProcessor extends Processor<string, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Init;
     }
@@ -40,7 +40,7 @@ class InitProcessor extends Processor<string, {}, CustomProcessorType> {
     }
 }
 
-class ProcessA extends Processor<string, {}, CustomProcessorType> {
+class ProcessA extends Processor<string, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessA;
     }
@@ -49,7 +49,7 @@ class ProcessA extends Processor<string, {}, CustomProcessorType> {
     }
 }
 
-class ProcessB extends Processor<string, {}, CustomProcessorType> {
+class ProcessB extends Processor<string, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.ProcessB;
     }
@@ -58,7 +58,7 @@ class ProcessB extends Processor<string, {}, CustomProcessorType> {
     }
 }
 
-class FinalProcessor extends Processor<string, {}, CustomProcessorType> {
+class FinalProcessor extends Processor<string, CustomProcessorType> {
     get type(): CustomProcessorType {
         return CustomProcessorType.Final;
     }
@@ -68,7 +68,7 @@ class FinalProcessor extends Processor<string, {}, CustomProcessorType> {
 }
 
 // Initialize the pipeline with custom processors
-const pipeline = new Pipeline<string, CustomProcessorType, CustomProcessorType>();
+const pipeline = new Pipeline<string, CustomProcessorType>();
 
 pipeline.register(new InitProcessor());
 pipeline.register(new ProcessA());
@@ -86,22 +86,22 @@ runPipeline();
 ## API
 ### Pipeline
 #### Methods
-- **constructor(steps?: Processor<unknown, Partial<ProcessorProps>, PT>[])**
+- **constructor(steps?: Processor<R, PT, Partial<ProcessorProps>>[])**
   Initializes a new pipeline with optional initial steps.
 
-- **clearCache()**
+- **clearCache(): void**
   Clears the pipeline's cache.
 
-- **register<U, P extends Partial<ProcessorProps>, PT extends T>(processor: Processor<U, P, PT>, priority: number = -1): Processor<U, P, PT>**
+- **register<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number = -1): Processor<R, PT, P>**
   Registers a new processor in the pipeline.
 
-- **tryRegister<U, P extends Partial<ProcessorProps>, PT extends T>(processor: Processor<U, P, PT>, priority: number = -1): Processor<U, P, PT> | undefined**
+- **tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number): Processor<R, PT, P> | undefined**
   Attempts to register a new processor, returns undefined if registration fails.
 
-- **unregister<U, P extends Partial<ProcessorProps>, X extends T>(processor: Processor<U, P, X>): void**
+- **unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void**
   Unregisters a processor from the pipeline.
 
-- **process(data?: R): Promise<R>**
+- **process(data?: R): Promise<R | undefined>**
   Runs all registered processors and returns the final output.
 
 ## Contributing
