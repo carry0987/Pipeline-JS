@@ -73,23 +73,51 @@ class EventEmitter {
         this.callbacks[eventName] = this.callbacks[eventName].filter((value) => value != listener);
         return this;
     }
-    async emit(event, ...args) {
+    emit(event, ...args) {
         const eventName = event;
         // Initialize the event
         this.init(eventName);
-        // If there are callbacks for this event
-        if (this.callbacks[eventName].length > 0) {
-            // Execute all callbacks and wait for them to complete if they are promises
-            await Promise.all(this.callbacks[eventName].map(async (value) => await value(...args)));
+        // If there are no callbacks, return false
+        if (this.callbacks[eventName].length <= 0) {
+            return false;
+        }
+        // Get all results
+        const results = this.callbacks[eventName].map(callback => {
+            try {
+                // Execute callback and capture the result
+                const result = callback(...args);
+                // If result is a promise, wrap it in Promise.resolve to handle uniformly
+                return result instanceof Promise ? result : Promise.resolve(result);
+            }
+            catch (e) {
+                console.error(`Error in event listener for event: ${eventName}`, e); // Logging error
+                // Even if an error occurs, continue processing other callbacks
+                return Promise.resolve();
+            }
+        });
+        // Check if any result is a promise
+        const hasPromise = results.some(result => result instanceof Promise);
+        // If there is at least one promise, return a promise that resolves when all promises resolve
+        if (hasPromise) {
+            return Promise.all(results).then(() => true).catch((e) => {
+                console.error(`Error handling promises for event: ${eventName}`, e); // Logging error
+                return false;
+            });
+        }
+        else {
+            // If no promises, return true
             return true;
         }
-        return false;
     }
     once(event, listener) {
         this.checkListener(listener);
-        const onceListener = async (...args) => {
-            await listener(...args);
+        const onceListener = (...args) => {
+            // Use a sync wrapper to ensure the listener is removed immediately after execution
+            const result = listener(...args);
+            // Remove the listener immediately
             this.off(event, onceListener);
+            // Handle async listeners by wrapping the result in Promise.resolve
+            return result instanceof Promise ? result : Promise.resolve(result);
         };
         return this.on(event, onceListener);
     }
@@ -341,42 +369,46 @@ class Pipeline extends EventEmitter {
     }
 }
 
-function generateUUID() {
-    return 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = (Math.random() * 16) | 0, v = c == 'x' ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
-}
-
-/**
- * Returns true if both objects are equal
- * @param obj1 left object
- * @param obj2 right object
- * @returns boolean
- */
 function deepEqual(obj1, obj2) {
-    // If objects are not the same type, return false
     if (typeof obj1 !== typeof obj2)
         return false;
-    // If objects are both null or undefined, return true
     if (obj1 === null || obj2 === null)
         return obj1 === obj2;
-    // If objects are both primitive types, compare them directly
-    if (typeof obj1 !== 'object' && typeof obj2 !== 'object') {
+    if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
         return obj1 === obj2;
     }
-    // If objects are arrays, compare their elements recursively
+    if (obj1 instanceof Date && obj2 instanceof Date) {
+        return obj1.getTime() === obj2.getTime();
+    }
     if (Array.isArray(obj1) && Array.isArray(obj2)) {
         if (obj1.length !== obj2.length)
             return false;
         return obj1.every((item, index) => deepEqual(item, obj2[index]));
     }
-    // If one is array and the other is not, return false
     if (Array.isArray(obj1) || Array.isArray(obj2))
         return false;
-    // If objects are both objects, compare their properties recursively
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
+    if (obj1 instanceof Set && obj2 instanceof Set) {
+        if (obj1.size !== obj2.size)
+            return false;
+        for (const item of obj1) {
+            if (!obj2.has(item))
+                return false;
+        }
+        return true;
+    }
+    if (obj1 instanceof Map && obj2 instanceof Map) {
+        if (obj1.size !== obj2.size)
+            return false;
+        for (const [key, value] of obj1) {
+            if (!deepEqual(value, obj2.get(key)))
+                return false;
+        }
+        return true;
+    }
+    if (Object.getPrototypeOf(obj1) !== Object.getPrototypeOf(obj2))
+        return false;
+    const keys1 = Reflect.ownKeys(obj1);
+    const keys2 = Reflect.ownKeys(obj2);
     if (keys1.length !== keys2.length)
         return false;
     for (const key of keys1) {
@@ -384,6 +416,12 @@ function deepEqual(obj1, obj2) {
             return false;
     }
     return true;
+}
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0, v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
 }
 
 // The order of enum items define the processing order of the processor type
@@ -448,6 +486,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.7';
+const version = '1.2.8';
 
 export { Pipeline, Processor, version };

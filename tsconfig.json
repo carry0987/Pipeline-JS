@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "ESNext",
         "target": "ESNext",
-        "moduleResolution": "node",
+        "moduleResolution": "Node",
         "importHelpers": true,
         "strict": true,
         "esModuleInterop": true,

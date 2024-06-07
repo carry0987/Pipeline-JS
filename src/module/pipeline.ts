@@ -1,10 +1,9 @@
 import { Processor } from './processor';
-import { ID } from './utils/id';
 import log from './utils/log';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { PipelineEvents } from '../interface/events';
 import { ProcessorProps } from '../interface/interfaces';
-import { ProcessorType } from '../type/types';
+import { ProcessorType, ID } from '../type/types';
 
 class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     // Available steps for this pipeline

@@ -1,11 +1,10 @@
 import { EventEmitter } from '@carry0987/event-emitter';
 
-type ID = string;
-
 interface ProcessorProps {
 }
 
 type ProcessorType = string | number;
+type ID = string;
 
 interface PipelineEvents<R> {
     /**
@@ -191,4 +190,4 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
 
 declare const version: string;
 
-export { Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, type ProcessorType, version };
+export { type ID, Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, type ProcessorType, version };
