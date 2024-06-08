@@ -1,5 +1,5 @@
-import { Pipeline } from '../src/module/pipeline';
-import { Processor } from '../src/module/processor';
+import { test, expect, vi } from 'vitest';
+import { Pipeline, Processor } from '../src/index';
 import { ProcessorType } from './type/types';
 import log from '../src/module/utils/log';
 
@@ -51,7 +51,7 @@ test('Pipeline handles processing errors correctly', async () => {
     pipeline.register(processor);
 
     // Mock the log.error method to avoid actual logging during tests
-    const logSpy = jest.spyOn(log, 'error').mockImplementation(() => {});
+    const logSpy = vi.spyOn(log, 'error').mockImplementation(() => {});
 
     await expect(pipeline.process('input')).rejects.toThrow('Processing failed');
     expect(logSpy).toHaveBeenCalled();

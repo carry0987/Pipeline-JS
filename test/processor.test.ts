@@ -1,4 +1,5 @@
-import { Processor } from '../src/module/processor';
+import { test, expect, vi } from 'vitest';
+import { Processor } from '../src/index';
 import { ProcessorType } from './type/types';
 
 // MockProcessor class defined with generic types
@@ -28,9 +29,9 @@ test('Processor sets and updates properties correctly', () => {
 
 test('Processor emits events correctly', async () => {
     const processor = new MockProcessor();
-    const beforeProcessSpy = jest.fn();
-    const afterProcessSpy = jest.fn();
-    const errorSpy = jest.fn();
+    const beforeProcessSpy = vi.fn();
+    const afterProcessSpy = vi.fn();
+    const errorSpy = vi.fn();
 
     processor.on('beforeProcess', beforeProcessSpy);
     processor.on('afterProcess', afterProcessSpy);
