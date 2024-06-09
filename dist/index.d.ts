@@ -30,7 +30,7 @@ interface PipelineEvents<R> {
      * afterProcess will not be called if there is an
      * error in the pipeline (i.e a step throw an Error)
      */
-    afterProcess: (prev: R | undefined) => void;
+    afterProcess: (prev: R | Array<R | undefined> | undefined) => void;
     /**
      * Triggers the callback function when the pipeline
      * fails to process all steps or at least one step
@@ -148,6 +148,11 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      * @param data
      */
     process(data?: R): Promise<R | undefined>;
+    /**
+     * Runs all registered processors in parallel and returns the final results after running all steps.
+     * @param data
+     */
+    processInParallel(data?: R): Promise<Array<R | undefined>>;
     /**
      * Removes all processors from the pipeline
      */

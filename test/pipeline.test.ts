@@ -33,6 +33,29 @@ test('Pipeline processes data correctly', async () => {
     expect(result).toBe('processed');
 });
 
+test('Pipeline processes data in parallel correctly', async () => {
+    class ParallelProcessor extends Processor<string, ProcessorType> {
+        get type(): ProcessorType {
+            return ProcessorType.Extractor;
+        }
+
+        protected async _process(): Promise<string> {
+            return 'parallel_processed';
+        }
+    }
+
+    const pipeline = new Pipeline<string, ProcessorType>();
+    const processor1 = new MockProcessor();
+    const processor2 = new ParallelProcessor();
+
+    pipeline.register(processor1);
+    pipeline.register(processor2);
+
+    const results = await pipeline.processInParallel('input');
+
+    expect(results).toEqual(['processed', 'parallel_processed']);
+});
+
 test('Pipeline registers and unregisters processors correctly', () => {
     const pipeline = new Pipeline<string, ProcessorType>();
     const processor = new MockProcessor();

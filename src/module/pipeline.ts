@@ -207,6 +207,20 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
     }
 
     /**
+     * Runs all registered processors in parallel and returns the final results after running all steps.
+     * @param data
+     */
+    public async processInParallel(data?: R): Promise<Array<R | undefined>> {
+        const steps = this.steps;
+        const results = await Promise.all(steps.map(processor => processor.process(data)));
+        results.forEach((result, index) => this.cache.set(steps[index].id, result));
+        this.lastProcessorIndexUpdated = steps.length;
+        this.emit('afterProcess', results);
+
+        return results;
+    }
+
+    /**
      * Removes all processors from the pipeline
      */
     public clearProcessors(): void {

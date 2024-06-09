@@ -290,6 +290,18 @@ class Pipeline extends EventEmitter {
         return prev;
     }
     /**
+     * Runs all registered processors in parallel and returns the final results after running all steps.
+     * @param data
+     */
+    async processInParallel(data) {
+        const steps = this.steps;
+        const results = await Promise.all(steps.map(processor => processor.process(data)));
+        results.forEach((result, index) => this.cache.set(steps[index].id, result));
+        this.lastProcessorIndexUpdated = steps.length;
+        this.emit('afterProcess', results);
+        return results;
+    }
+    /**
      * Removes all processors from the pipeline
      */
     clearProcessors() {
@@ -486,6 +498,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.10';
+const version = '1.3.0';
 
 export { Pipeline, Processor, version };
