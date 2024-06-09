@@ -190,4 +190,4 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
 
 declare const version: string;
 
-export { type ID, Pipeline, type PipelineEvents, Processor, type ProcessorEvents, type ProcessorProps, type ProcessorType, version };
+export { type ID, Pipeline, Processor, type ProcessorProps, version };

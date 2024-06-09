@@ -1,6 +1,5 @@
 export { Pipeline } from './module/pipeline';
 export { Processor } from './module/processor';
 export { version } from './module/version';
-export * from './interface/events';
-export * from './interface/interfaces';
-export * from './type/types';
+export { ProcessorProps } from './interface/interfaces';
+export { ID } from './type/types';

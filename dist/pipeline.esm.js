@@ -486,6 +486,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.2.9';
+const version = '1.2.10';
 
 export { Pipeline, Processor, version };
