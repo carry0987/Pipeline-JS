@@ -212,6 +212,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      */
     public async processInParallel(data?: R): Promise<Array<R | undefined>> {
         const steps = this.steps;
+        // No need for processor index check because all processors run in parallel
         const results = await Promise.all(steps.map(processor => processor.process(data)));
         results.forEach((result, index) => this.cache.set(steps[index].id, result));
         this.lastProcessorIndexUpdated = steps.length;

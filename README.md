@@ -8,6 +8,7 @@
 - **Event-Driven**: Utilize event emitters to handle various pipeline events.
 - **Caching Mechanism**: Avoid redundant processing with built-in caching.
 - **Flexible Configuration**: Customize and extend the pipeline according to your needs.
+- **Parallel Processing**: Run all registered processors in parallel with the `processInParallel` method.
 
 ## Installation
 Install the package via npm:
@@ -103,6 +104,9 @@ runPipeline();
 
 - **`process(data?: R): Promise<R | undefined>`**  
   Runs all registered processors and returns the final output.
+
+- **`processInParallel(data?: R): Promise<Array<R | undefined>>`**  
+  Runs all registered processors in parallel and returns the final results after running all steps.
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request with your changes.

@@ -295,6 +295,7 @@ class Pipeline extends EventEmitter {
      */
     async processInParallel(data) {
         const steps = this.steps;
+        // No need for processor index check because all processors run in parallel
         const results = await Promise.all(steps.map(processor => processor.process(data)));
         results.forEach((result, index) => this.cache.set(steps[index].id, result));
         this.lastProcessorIndexUpdated = steps.length;
@@ -498,6 +499,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.0';
+const version = '1.3.1';
 
 export { Pipeline, Processor, version };
