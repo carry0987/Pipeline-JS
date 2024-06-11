@@ -90,7 +90,7 @@ test('Pipeline caches processor results correctly', async () => {
     await pipeline.process('input');
 
     // Use the cached result
-    const cachedResult = await pipeline.runProcessorByID(processor.id, 'input', false);
+    const cachedResult = await pipeline.runProcessorByID(processor.id, 'input');
     expect(cachedResult).toBe('processed');
 
     // Verify that steps length remains 1 (no additional processor was added)

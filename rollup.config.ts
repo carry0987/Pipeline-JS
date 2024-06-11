@@ -1,15 +1,25 @@
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
-import resolve from '@rollup/plugin-node-resolve';
+import tsConfigPaths from 'rollup-plugin-tsconfig-paths';
+import nodeResolve from '@rollup/plugin-node-resolve';
 import { dts } from 'rollup-plugin-dts';
 import del from 'rollup-plugin-delete';
 import { createRequire } from 'module';
-const pkg = createRequire(import.meta.url)('./package.json');
 
+const pkg = createRequire(import.meta.url)('./package.json');
 const isProduction = process.env.BUILD === 'production';
 const sourceFile = 'src/index.ts';
-const dtsFile = 'dist/dts/index.d.ts';
+
+// Common plugins for all builds
+const commonPlugins = [
+    typescript(),
+    nodeResolve(),
+    replace({
+        preventAssignment: true,
+        __version__: pkg.version
+    }),
+];
 
 const jsConfig = {
     input: sourceFile,
@@ -21,14 +31,7 @@ const jsConfig = {
             plugins: isProduction ? [terser()] : []
         }
     ],
-    plugins: [
-        typescript(),
-        resolve(),
-        replace({
-            preventAssignment: true,
-            __version__: pkg.version
-        })
-    ]
+    plugins: commonPlugins
 };
 
 const esConfig = {
@@ -39,24 +42,18 @@ const esConfig = {
             format: 'es'
         }
     ],
-    plugins: [
-        typescript(),
-        resolve(),
-        replace({
-            preventAssignment: true,
-            __version__: pkg.version
-        })
-    ]
+    plugins: commonPlugins
 };
 
 const dtsConfig = {
-    input: dtsFile,
+    input: sourceFile,
     output: {
         file: pkg.types,
         format: 'es'
     },
     external: [/\.css$/u],
     plugins: [
+        tsConfigPaths(),
         dts(),
         del({ hook: 'buildEnd', targets: 'dist/dts' })
     ]

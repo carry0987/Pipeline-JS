@@ -8,8 +8,11 @@
         "esModuleInterop": true,
         "declaration": true,
         "outDir": "./dist",
-        "declarationDir": "dist/dts/",
-        "forceConsistentCasingInFileNames": true
+        "declarationDir": "./dist/dts/",
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "**/__tests__/*"]

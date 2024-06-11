@@ -1,6 +1,6 @@
 import { ProcessorProps } from './interfaces';
-import { Processor } from '../module/processor';
-import { ProcessorType } from '../type/types';
+import { Processor } from '@/module/processor';
+import { ProcessorType } from '@/type/types';
 
 export interface PipelineEvents<R> {
     /**

@@ -1,9 +1,9 @@
 import { Processor } from './processor';
 import log from './utils/log';
+import { PipelineEvents } from '@/interface/events';
+import { ProcessorProps } from '@/interface/interfaces';
+import { ProcessorType, ID } from '@/type/types';
 import { EventEmitter } from '@carry0987/event-emitter';
-import { PipelineEvents } from '../interface/events';
-import { ProcessorProps } from '../interface/interfaces';
-import { ProcessorType, ID } from '../type/types';
 
 class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     // Available steps for this pipeline
@@ -165,6 +165,8 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      *
      * @param data
      */
+    public async process(): Promise<undefined>;
+    public async process(data: R): Promise<R>;
     public async process(data?: R): Promise<R | undefined> {
         const lastProcessorIndexUpdated = this.lastProcessorIndexUpdated;
         const steps = this.steps;
@@ -210,6 +212,8 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * Runs all registered processors in parallel and returns the final results after running all steps.
      * @param data
      */
+    public async processInParallel(): Promise<Array<undefined>>;
+    public async processInParallel(data: R): Promise<Array<R>>;
     public async processInParallel(data?: R): Promise<Array<R | undefined>> {
         const steps = this.steps;
         // No need for processor index check because all processors run in parallel
@@ -255,11 +259,23 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    public async runProcessorByID(processorID: ID, data?: R, runAllFollowing: boolean = true): Promise<R | undefined> {
+    public async runProcessorByID(processorID: ID): Promise<undefined>;
+    public async runProcessorByID(processorID: ID, data: R): Promise<R>;
+    public async runProcessorByID(processorID: ID, data: R, runAllFollowing: boolean): Promise<R>;
+    public async runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<undefined>;
+    public async runProcessorByID(processorID: ID, dataOrRunAllFollowing?: R | boolean, runAllFollowing: boolean = true): Promise<R | undefined> {
         const processorIndex = this.findProcessorIndexByID(processorID);
 
         if (processorIndex === -1) {
             throw Error(`Processor ID ${processorID} not found`);
+        }
+
+        // Determine the actual type of dataOrRunAllFollowing
+        let data: R | undefined;
+        if (typeof dataOrRunAllFollowing === 'boolean') {
+            runAllFollowing = dataOrRunAllFollowing;
+        } else {
+            data = dataOrRunAllFollowing;
         }
 
         if (runAllFollowing) {
@@ -271,7 +287,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
             this.cache.delete(processorID);
         }
 
-        return this.process(data);
+        return data ? this.process(data) : this.process();
     }
 
     /**

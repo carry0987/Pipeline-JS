@@ -247,12 +247,6 @@ class Pipeline extends EventEmitter {
     getSortedProcessorTypes() {
         return Array.from(this._steps.keys());
     }
-    /**
-     * Runs all registered processors based on their correct priority
-     * and returns the final output after running all steps
-     *
-     * @param data
-     */
     async process(data) {
         const lastProcessorIndexUpdated = this.lastProcessorIndexUpdated;
         const steps = this.steps;
@@ -289,10 +283,6 @@ class Pipeline extends EventEmitter {
         this.emit('afterProcess', prev);
         return prev;
     }
-    /**
-     * Runs all registered processors in parallel and returns the final results after running all steps.
-     * @param data
-     */
     async processInParallel(data) {
         const steps = this.steps;
         // No need for processor index check because all processors run in parallel
@@ -326,17 +316,18 @@ class Pipeline extends EventEmitter {
     findProcessorIndexByID(processorID) {
         return this.steps.findIndex((p) => p.id == processorID);
     }
-    /**
-     * Runs a processor by its ID
-     *
-     * @param processorID
-     * @param data
-     * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
-     */
-    async runProcessorByID(processorID, data, runAllFollowing = true) {
+    async runProcessorByID(processorID, dataOrRunAllFollowing, runAllFollowing = true) {
         const processorIndex = this.findProcessorIndexByID(processorID);
         if (processorIndex === -1) {
             throw Error(`Processor ID ${processorID} not found`);
+        }
+        // Determine the actual type of dataOrRunAllFollowing
+        let data;
+        if (typeof dataOrRunAllFollowing === 'boolean') {
+            runAllFollowing = dataOrRunAllFollowing;
+        }
+        else {
+            data = dataOrRunAllFollowing;
         }
         if (runAllFollowing) {
             this.lastProcessorIndexUpdated = processorIndex;
@@ -347,7 +338,7 @@ class Pipeline extends EventEmitter {
             // If not re-running all, just clear the cache for the specific processor
             this.cache.delete(processorID);
         }
-        return this.process(data);
+        return data ? this.process(data) : this.process();
     }
     /**
      * Clears the cache for all processors after the specified index
@@ -499,6 +490,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.1';
+const version = '1.3.2';
 
 export { Pipeline, Processor, version };

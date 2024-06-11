@@ -1,8 +1,8 @@
+import { ProcessorProps } from '@/interface/interfaces';
+import { ProcessorEvents } from '@/interface/events';
+import { ProcessorType, ID } from '@/type/types';
 import { EventEmitter } from '@carry0987/event-emitter';
 import { deepEqual, generateUUID } from '@carry0987/utils';
-import { ProcessorProps } from '../interface/interfaces';
-import { ProcessorEvents } from '../interface/events';
-import { ProcessorType, ID } from '../type/types';
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
