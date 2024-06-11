@@ -82,7 +82,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      *
      * @param processor
      */
-    public unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void {
+    public unregister<P extends Partial<ProcessorProps>>(processor?: Processor<R, PT, P>): void {
         if (!processor) return;
         if (this.findProcessorIndexByID(processor.id) === -1) return;
 

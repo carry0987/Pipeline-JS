@@ -118,7 +118,7 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      *
      * @param processor
      */
-    unregister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>): void;
+    unregister<P extends Partial<ProcessorProps>>(processor?: Processor<R, PT, P>): void;
     /**
      * Registers a new processor
      *
