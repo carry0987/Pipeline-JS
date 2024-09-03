@@ -156,7 +156,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * Returns a list of ProcessorType according to their priority
      */
     private getSortedProcessorTypes(): T[] {
-        return Array.from(this._steps.keys());
+        return Array.from(this._steps.keys()).sort((a, b) => Number(a) - Number(b));
     }
 
     /**

@@ -245,7 +245,7 @@ class Pipeline extends EventEmitter {
      * Returns a list of ProcessorType according to their priority
      */
     getSortedProcessorTypes() {
-        return Array.from(this._steps.keys());
+        return Array.from(this._steps.keys()).sort((a, b) => Number(a) - Number(b));
     }
     async process(data) {
         const lastProcessorIndexUpdated = this.lastProcessorIndexUpdated;
@@ -490,6 +490,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.5';
+const version = '1.3.6';
 
 export { Pipeline, Processor, version };
