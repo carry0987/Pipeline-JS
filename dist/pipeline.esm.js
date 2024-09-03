@@ -441,7 +441,7 @@ class Processor extends EventEmitter {
         this._props = {};
         this._status = 'idle';
         this.id = generateUUID();
-        this.name = name;
+        this.name = name ?? this.constructor.name;
         if (props)
             this.setProps(props);
     }
@@ -490,6 +490,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.3';
+const version = '1.3.4';
 
 export { Pipeline, Processor, version };

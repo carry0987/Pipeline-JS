@@ -23,7 +23,7 @@ abstract class Processor<T, PT extends ProcessorType, P extends Partial<Processo
         this._props = {} as P;
         this._status = 'idle';
         this.id = generateUUID();
-        this.name = name;
+        this.name = name ?? this.constructor.name;
 
         if (props) this.setProps(props);
     }
