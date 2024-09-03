@@ -172,7 +172,7 @@ class Pipeline extends EventEmitter {
      * @param processor
      * @param priority
      */
-    tryRegister(processor, priority) {
+    tryRegister(processor, priority = -1) {
         try {
             return this.register(processor, priority);
         }
@@ -490,6 +490,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.4';
+const version = '1.3.5';
 
 export { Pipeline, Processor, version };

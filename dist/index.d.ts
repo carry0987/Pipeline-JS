@@ -112,7 +112,7 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      * @param processor
      * @param priority
      */
-    tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority: number): Processor<R, PT, P> | undefined;
+    tryRegister<P extends Partial<ProcessorProps>>(processor: Processor<R, PT, P>, priority?: number): Processor<R, PT, P> | undefined;
     /**
      * Removes a processor from the list
      *

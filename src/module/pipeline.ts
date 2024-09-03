@@ -68,7 +68,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      */
     public tryRegister<P extends Partial<ProcessorProps>>(
         processor: Processor<R, PT, P>,
-        priority: number
+        priority: number = -1
     ): Processor<R, PT, P> | undefined {
         try {
             return this.register(processor, priority);
