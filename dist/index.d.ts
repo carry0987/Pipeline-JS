@@ -147,13 +147,13 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      *
      * @param data
      */
-    process(): Promise<undefined>;
+    process(): Promise<R | undefined>;
     process(data: R): Promise<R>;
     /**
      * Runs all registered processors in parallel and returns the final results after running all steps.
      * @param data
      */
-    processInParallel(): Promise<Array<undefined>>;
+    processInParallel(): Promise<Array<R | undefined>>;
     processInParallel(data: R): Promise<Array<R>>;
     /**
      * Removes all processors from the pipeline
@@ -178,10 +178,10 @@ declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends Eve
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    runProcessorByID(processorID: ID): Promise<undefined>;
+    runProcessorByID(processorID: ID): Promise<R | undefined>;
     runProcessorByID(processorID: ID, data: R): Promise<R>;
     runProcessorByID(processorID: ID, data: R, runAllFollowing: boolean): Promise<R>;
-    runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<undefined>;
+    runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<R | undefined>;
     /**
      * Clears the cache for all processors after the specified index
      *

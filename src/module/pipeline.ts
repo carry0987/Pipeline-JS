@@ -165,7 +165,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      *
      * @param data
      */
-    public async process(): Promise<undefined>;
+    public async process(): Promise<R | undefined>;
     public async process(data: R): Promise<R>;
     public async process(data?: R): Promise<R | undefined> {
         const lastProcessorIndexUpdated = this.lastProcessorIndexUpdated;
@@ -212,7 +212,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * Runs all registered processors in parallel and returns the final results after running all steps.
      * @param data
      */
-    public async processInParallel(): Promise<Array<undefined>>;
+    public async processInParallel(): Promise<Array<R | undefined>>;
     public async processInParallel(data: R): Promise<Array<R>>;
     public async processInParallel(data?: R): Promise<Array<R | undefined>> {
         const steps = this.steps;
@@ -259,10 +259,10 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * @param data
      * @param rerunAllFollowing (optional) if true, rerun all processors following the specified processor
      */
-    public async runProcessorByID(processorID: ID): Promise<undefined>;
+    public async runProcessorByID(processorID: ID): Promise<R | undefined>;
     public async runProcessorByID(processorID: ID, data: R): Promise<R>;
     public async runProcessorByID(processorID: ID, data: R, runAllFollowing: boolean): Promise<R>;
-    public async runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<undefined>;
+    public async runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<R | undefined>;
     public async runProcessorByID(processorID: ID, dataOrRunAllFollowing?: R | boolean, runAllFollowing: boolean = true): Promise<R | undefined> {
         const processorIndex = this.findProcessorIndexByID(processorID);
 
