@@ -25,7 +25,7 @@ const jsConfig = {
     input: sourceFile,
     output: [
         {
-            file: pkg.main,
+            file: pkg.exports['.'].umd,
             format: 'umd',
             name: 'PipelineJS',
             plugins: isProduction ? [terser()] : []
@@ -38,7 +38,7 @@ const esConfig = {
     input: sourceFile,
     output: [
         {
-            file: pkg.module,
+            file: pkg.exports['.'].import,
             format: 'es'
         }
     ],
@@ -48,7 +48,7 @@ const esConfig = {
 const dtsConfig = {
     input: sourceFile,
     output: {
-        file: pkg.types,
+        file: pkg.exports['.'].types,
         format: 'es'
     },
     external: [/\.css$/u],
