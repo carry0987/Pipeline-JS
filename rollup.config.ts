@@ -1,10 +1,10 @@
+import { RollupOptions } from 'rollup';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 import replace from '@rollup/plugin-replace';
 import tsConfigPaths from 'rollup-plugin-tsconfig-paths';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { dts } from 'rollup-plugin-dts';
-import del from 'rollup-plugin-delete';
 import { createRequire } from 'module';
 
 const pkg = createRequire(import.meta.url)('./package.json');
@@ -14,6 +14,7 @@ const sourceFile = 'src/index.ts';
 // Common plugins for all builds
 const commonPlugins = [
     typescript(),
+    tsConfigPaths(),
     nodeResolve(),
     replace({
         preventAssignment: true,
@@ -21,7 +22,7 @@ const commonPlugins = [
     }),
 ];
 
-const jsConfig = {
+const jsConfig: RollupOptions = {
     input: sourceFile,
     output: [
         {
@@ -34,7 +35,7 @@ const jsConfig = {
     plugins: commonPlugins
 };
 
-const esConfig = {
+const esConfig: RollupOptions = {
     input: sourceFile,
     output: [
         {
@@ -45,17 +46,15 @@ const esConfig = {
     plugins: commonPlugins
 };
 
-const dtsConfig = {
+const dtsConfig: RollupOptions = {
     input: sourceFile,
     output: {
         file: pkg.exports['.'].types,
         format: 'es'
     },
-    external: [/\.css$/u],
     plugins: [
         tsConfigPaths(),
-        dts(),
-        del({ hook: 'buildEnd', targets: 'dist/dts' })
+        dts()
     ]
 };
 
