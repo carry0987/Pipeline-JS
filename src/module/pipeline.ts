@@ -7,7 +7,10 @@ import { EventEmitter } from '@carry0987/event-emitter';
 
 class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {
     // Available steps for this pipeline
-    private readonly _steps: Map<T, Processor<R, PT, Partial<ProcessorProps>>[]> = new Map<T, Processor<R, PT, Partial<ProcessorProps>>[]>();
+    private readonly _steps: Map<T, Processor<R, PT, Partial<ProcessorProps>>[]> = new Map<
+        T,
+        Processor<R, PT, Partial<ProcessorProps>>[]
+    >();
     // Used to cache the results of processors using their id field
     private cache: Map<string, R> = new Map<string, R>();
     // Keeps the index of the last updated processor in the registered
@@ -217,7 +220,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
     public async processInParallel(data?: R): Promise<Array<R | undefined>> {
         const steps = this.steps;
         // No need for processor index check because all processors run in parallel
-        const results = await Promise.all(steps.map(processor => processor.process(data)));
+        const results = await Promise.all(steps.map((processor) => processor.process(data)));
         results.forEach((result, index) => this.cache.set(steps[index].id, result));
         this.lastProcessorIndexUpdated = steps.length;
         this.emit('afterProcess', results);
@@ -263,7 +266,11 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
     public async runProcessorByID(processorID: ID, data: R): Promise<R>;
     public async runProcessorByID(processorID: ID, data: R, runAllFollowing: boolean): Promise<R>;
     public async runProcessorByID(processorID: ID, runAllFollowing: boolean): Promise<R | undefined>;
-    public async runProcessorByID(processorID: ID, dataOrRunAllFollowing?: R | boolean, runAllFollowing: boolean = true): Promise<R | undefined> {
+    public async runProcessorByID(
+        processorID: ID,
+        dataOrRunAllFollowing?: R | boolean,
+        runAllFollowing: boolean = true
+    ): Promise<R | undefined> {
         const processorIndex = this.findProcessorIndexByID(processorID);
 
         if (processorIndex === -1) {
@@ -296,7 +303,7 @@ class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitte
      * @param index
      */
     private clearCacheAfterProcessorIndex(index: number): void {
-        this.steps.slice(index).forEach(processor => {
+        this.steps.slice(index).forEach((processor) => {
             this.cache.delete(processor.id);
         });
     }

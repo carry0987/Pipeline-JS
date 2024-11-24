@@ -8,9 +8,7 @@ export interface PipelineEvents<R> {
      * is updated, including when a new processor is registered, a processor's props
      * get updated, etc.
      */
-    updated: <T, PT extends ProcessorType, P extends ProcessorProps>(
-        processor: Processor<T, PT, P>
-    ) => void;
+    updated: <T, PT extends ProcessorType, P extends ProcessorProps>(processor: Processor<T, PT, P>) => void;
     /**
      * Triggers the callback function when a new
      * processor is registered successfully
@@ -40,7 +38,7 @@ export interface PipelineEvents<R> {
 export interface ProcessorEvents {
     /**
      * Event triggered when a processor's properties are updated.
-     * 
+     *
      * @param processor - The processor instance that had its properties updated.
      */
     propsUpdated: <T, PT extends ProcessorType, P extends Partial<ProcessorProps>>(
@@ -50,7 +48,7 @@ export interface ProcessorEvents {
     /**
      * Event triggered before a processor starts processing.
      * This allows for any pre-processing steps or logging to occur.
-     * 
+     *
      * @param args - Arguments passed to the process method.
      */
     beforeProcess: (...args: any[]) => void;
@@ -58,7 +56,7 @@ export interface ProcessorEvents {
     /**
      * Event triggered after a processor finishes processing.
      * This allows for any post-processing steps or logging to occur.
-     * 
+     *
      * @param args - Arguments passed to the process method.
      */
     afterProcess: (...args: any[]) => void;
@@ -66,7 +64,7 @@ export interface ProcessorEvents {
     /**
      * Event triggered when a processing error occurs.
      * This allows for error handling or logging to take place.
-     * 
+     *
      * @param error - The error that occurred during processing.
      * @param args - Arguments passed to the process method.
      */

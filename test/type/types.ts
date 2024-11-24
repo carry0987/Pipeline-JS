@@ -7,5 +7,5 @@ export enum ProcessorType {
     Transformer,
     Filter,
     Sort,
-    Limit,
+    Limit
 }

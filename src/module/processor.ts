@@ -6,12 +6,16 @@ import { deepEqual, generateUUID } from '@carry0987/utils';
 
 // The order of enum items define the processing order of the processor type
 // e.g. Extractor = 0 will be processed before Transformer = 1
-abstract class Processor<T, PT extends ProcessorType, P extends Partial<ProcessorProps> = {}> extends EventEmitter<ProcessorEvents> {
+abstract class Processor<
+    T,
+    PT extends ProcessorType,
+    P extends Partial<ProcessorProps> = {}
+> extends EventEmitter<ProcessorEvents> {
     public readonly id: ID;
     public readonly name?: string;
     private static readonly _statusTypes = ['idle', 'running', 'completed'] as const;
     private _props: P;
-    private _status: typeof Processor._statusTypes[number];
+    private _status: (typeof Processor._statusTypes)[number];
 
     abstract get type(): PT;
     protected abstract _process(...args: any[]): Promise<T>;
@@ -38,10 +42,10 @@ abstract class Processor<T, PT extends ProcessorType, P extends Partial<Processo
         if (this.validateProps instanceof Function) {
             this.validateProps(...args);
         }
-    
+
         this._status = 'running';
         this.emit('beforeProcess', ...args);
-    
+
         try {
             const result = await this._process(...args);
             this._status = 'completed';
@@ -59,7 +63,7 @@ abstract class Processor<T, PT extends ProcessorType, P extends Partial<Processo
     public setProps(props: Partial<P>): this {
         const updatedProps = {
             ...this._props,
-            ...props,
+            ...props
         };
 
         if (!deepEqual(updatedProps, this._props)) {
@@ -74,7 +78,7 @@ abstract class Processor<T, PT extends ProcessorType, P extends Partial<Processo
         return this._props;
     }
 
-    public get status(): typeof Processor._statusTypes[number] {
+    public get status(): (typeof Processor._statusTypes)[number] {
         return this._status;
     }
 }
