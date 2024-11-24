@@ -88,7 +88,7 @@ declare abstract class Processor<T, PT extends ProcessorType, P extends Partial<
     process(...args: any[]): Promise<T>;
     setProps(props: Partial<P>): this;
     get props(): P;
-    get status(): typeof Processor._statusTypes[number];
+    get status(): (typeof Processor._statusTypes)[number];
 }
 
 declare class Pipeline<R, T extends ProcessorType, PT extends T = T> extends EventEmitter<PipelineEvents<R>> {

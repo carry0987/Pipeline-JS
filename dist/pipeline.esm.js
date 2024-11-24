@@ -362,7 +362,7 @@ class Pipeline extends EventEmitter {
     async processInParallel(data) {
         const steps = this.steps;
         // No need for processor index check because all processors run in parallel
-        const results = await Promise.all(steps.map(processor => processor.process(data)));
+        const results = await Promise.all(steps.map((processor) => processor.process(data)));
         results.forEach((result, index) => this.cache.set(steps[index].id, result));
         this.lastProcessorIndexUpdated = steps.length;
         this.emit('afterProcess', results);
@@ -422,7 +422,7 @@ class Pipeline extends EventEmitter {
      * @param index
      */
     clearCacheAfterProcessorIndex(index) {
-        this.steps.slice(index).forEach(processor => {
+        this.steps.slice(index).forEach((processor) => {
             this.cache.delete(processor.id);
         });
     }
@@ -550,7 +550,7 @@ class Processor extends EventEmitter {
     setProps(props) {
         const updatedProps = {
             ...this._props,
-            ...props,
+            ...props
         };
         if (!deepEqual(updatedProps, this._props)) {
             this._props = updatedProps;
@@ -566,6 +566,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.10';
+const version = '1.3.11';
 
 export { Pipeline, Processor, version };
