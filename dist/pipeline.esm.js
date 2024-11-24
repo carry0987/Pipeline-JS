@@ -151,7 +151,7 @@ class EventEmitter {
             return false;
         }
         // Get all results
-        const results = this.callbacks[eventName].map(callback => {
+        const results = this.callbacks[eventName].map((callback) => {
             try {
                 // Execute callback and capture the result
                 const result = callback(...args);
@@ -165,10 +165,12 @@ class EventEmitter {
             }
         });
         // Check if any result is a promise
-        const hasPromise = results.some(result => result instanceof Promise);
+        const hasPromise = results.some((result) => result instanceof Promise);
         // If there is at least one promise, return a promise that resolves when all promises resolve
         if (hasPromise) {
-            return Promise.all(results).then(() => true).catch((e) => {
+            return Promise.all(results)
+                .then(() => true)
+                .catch((e) => {
                 console.error(`Error handling promises for event: ${eventName}`, e); // Logging error
                 return false;
             });
@@ -566,6 +568,6 @@ class Processor extends EventEmitter {
     }
 }
 
-const version = '1.3.11';
+const version = '1.3.12';
 
 export { Pipeline, Processor, version };
