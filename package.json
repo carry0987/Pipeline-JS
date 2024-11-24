@@ -40,7 +40,7 @@
   },
   "homepage": "https://github.com/carry0987/Pipeline-JS#readme",
   "devDependencies": {
-    "@carry0987/event-emitter": "^1.4.8",
+    "@carry0987/event-emitter": "^1.4.9",
     "@carry0987/utils": "^3.8.3",
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-replace": "^6.0.1",

@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@carry0987/event-emitter':
-        specifier: ^1.4.8
-        version: 1.4.8
+        specifier: ^1.4.9
+        version: 1.4.9
       '@carry0987/utils':
         specifier: ^3.8.3
         version: 3.8.3
@@ -55,8 +55,8 @@ packages:
     resolution: {integrity: sha512-Ed61U6XJc3CVRfkERJWDz4dJwKe7iLmmJsbOGu9wSloNSFttHV0I8g6UAgb7qnK5ly5bGLPd4oXZlxCdANBOWQ==}
     engines: {node: '>=6.9.0'}
 
-  '@carry0987/event-emitter@1.4.8':
-    resolution: {integrity: sha512-fdLIlZZm/L+HHNBTDVvkG9kI3V7r4CPoTQG0fnXnBTXo5RI29nrVr7NQoLxR6Cztpr5kJc2B4m4P4JPNzISVYw==}
+  '@carry0987/event-emitter@1.4.9':
+    resolution: {integrity: sha512-y1g6g5oZei/12SPbVEJ2k1MPP949O6j7S+WmsE81NCjrJpCtJ7KGYSmyUprEVXbNoCe1H9WmH3eY648+noerXw==}
 
   '@carry0987/utils@3.8.3':
     resolution: {integrity: sha512-Ps4IO873mUYEZhMYVUvRZ/w18Y/0vDa2ifOtw3SPCLdWZXBKzGs+DOg6yA5LcpWClWE9wsnLRMsvGSYV3cghzQ==}
@@ -695,7 +695,7 @@ snapshots:
   '@babel/helper-validator-identifier@7.25.9':
     optional: true
 
-  '@carry0987/event-emitter@1.4.8': {}
+  '@carry0987/event-emitter@1.4.9': {}
 
   '@carry0987/utils@3.8.3': {}
 
